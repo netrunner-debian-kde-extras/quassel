@@ -1,0 +1,3 @@
+debian/kde4-tmp/usr/share/icons/hicolor/ /usr/share/icons/
+debian/kde4-tmp/usr/share/pixmaps/ /usr/share/
+debian/kde4-tmp/usr/share/kde4/ /usr/share/

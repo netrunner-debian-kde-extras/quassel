@@ -1,0 +1,16 @@
+Description: Debian specific channels are added.
+ Debian IRC server with the default channel #debian is added
+ as well as the #debian-user channel on OFTC.
+Author: Thomas Mueller <thomas.mueller@tmit.eu>
+Last-Update: 2010-02-02
+--- quassel-0.4.0.orig/data/networks.orig.ini   2009-02-17 19:22:59.000000000 +0100
++++ quassel-0.4.0/data/networks.ini        2009-02-19 00:06:38.000000000 +0100
+@@ -25,0 +26,5 @@
++[DebianIRC]
++Default=Yes
++DefaultChannels=#debian
++Servers=irc.debian.org:6667
++
+@@ -41,0 +47,2 @@
++Default=Yes
++DefaultChannels=#debian-user

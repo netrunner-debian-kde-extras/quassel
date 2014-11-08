@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+BUILDDIR_KDE := obj-$(DEB_BUILD_GNU_TYPE)-kde4
+
+%:
+	dh $@ --buildsystem=cmake --with=kde
+
+override_dh_auto_configure:
+	rm -Rf $(BUILDDIR_KDE)
+	mkdir $(BUILDDIR_KDE)
+
+	dh_auto_configure --builddirectory=$(BUILDDIR_KDE) -- -DWANT_MONO=ON -DWITH_KDE=ON -DEMBED_DATA=OFF -DCMAKE_SKIP_RPATH=YES
+	dh_auto_configure -- -DWANT_MONO=ON -DWITH_KDE=OFF -DEMBED_DATA=ON -DCMAKE_SKIP_RPATH=YES
+
+override_dh_auto_build:
+	dh_auto_build --builddirectory=$(BUILDDIR_KDE)
+	dh_auto_build
+
+#override_dh_strip:
+#	dh_strip --builddirectory=$(BUILDDIR_KDE) --dbg-package=quassel-kde4-dbg
+#	dh_strip --dbg-package=quassel-dbg
+
+override_dh_auto_install:
+	dh_auto_install --builddirectory=$(BUILDDIR_KDE) --destdir=debian/kde4-tmp
+	rm -r debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/AUTHORS
+	rm -r debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/CONTRIBUTING
+	rm -r debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/COPYING
+	rm -rf debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/scalable/
+	
+	dh_auto_install
+
+override_dh_installinit:
+	dh_installinit -r --error-handler=exit --name=quasselcore
+
+override_dh_auto_clean:
+	#dh_auto_clean --builddirectory=$(BUILDDIR_KDE)
+	dh_auto_clean
+	rm -Rf debian/kde4-tmp
+	rm -Rf obj-*

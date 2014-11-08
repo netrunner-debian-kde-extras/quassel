@@ -1,0 +1,9 @@
+quassel (0.10.0-2) unstable; urgency=low
+
+  The certificate in /var/lib/quassel/quasselCert.pem was accessible by
+  all local users on this server which allows users to decipher traffic between
+  quassel core and connected clients.
+  We suggest to generate a new certificate to ensure secure communication.
+
+ -- Thomas Mueller <thomas.mueller@tmit.eu>  Fri, 04 Jul 2014 17:15:10 +0200
+

@@ -1,0 +1,53 @@
+#!/bin/sh -e
+# postinst script for quassel-core
+
+set -e
+
+# some variables
+QUASSEL_GROUP=quassel
+QUASSEL_USER=quasselcore
+QUASSEL_HOME=/var/lib/quassel
+QUASSEL_LOG=/var/log/quassel
+#QUASSEL_CONFIG=$QUASSEL_HOME/.config/quassel-irc.org
+QUASSEL_CERT=$QUASSEL_HOME/quasselCert.pem
+
+if [ ! -d $QUASSEL_HOME ] ; then
+  # create $HOME
+  echo "Creating $QUASSEL_HOME directory ..."
+  mkdir -p $QUASSEL_HOME
+fi
+
+# create group
+echo "Creating $QUASSEL_GROUP group ..."
+addgroup --quiet --system $QUASSEL_GROUP
+
+# create user
+echo "Creating $QUASSEL_USER user ..."
+adduser --quiet --system --ingroup $QUASSEL_GROUP \
+--home $QUASSEL_HOME --no-create-home $QUASSEL_USER
+
+chown $QUASSEL_USER:$QUASSEL_GROUP $QUASSEL_HOME
+
+if [ ! -d $QUASSEL_LOG ] ; then
+  echo "Creating $QUASSEL_LOG directory ..."
+  mkdir -p $QUASSEL_LOG
+  chown $QUASSEL_USER:$QUASSEL_GROUP -R $QUASSEL_LOG
+fi
+
+# generate a SSL certificate for 18 months (support time) + 6 months (development time)
+# this covers the worst case scenario of earliest possible install + no whatsoever
+# updates while support time frame. otherwise the key will be regenerated
+# FIXME: Not over-writing existing certs, but need to (someday) replace old certs
+if [ ! -e $QUASSEL_CERT ] ; then
+  echo "Generating SSL certificate as $QUASSEL_CERT ..."
+  openssl req -x509 -nodes -batch -days 680 -newkey rsa -keyout \
+  $QUASSEL_CERT -out $QUASSEL_CERT
+  chown $QUASSEL_USER:$QUASSEL_GROUP $QUASSEL_CERT
+fi
+
+chmod 0440 $QUASSEL_CERT
+
+
+#DEBHELPER#
+
+exit 0

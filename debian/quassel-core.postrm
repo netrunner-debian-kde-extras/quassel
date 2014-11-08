@@ -1,0 +1,39 @@
+#!/bin/sh
+# postrm script for quassel-core
+
+set -e
+
+# configure some variables
+QUASSEL_GROUP=quassel
+QUASSEL_USER=quasselcore
+
+case "$1" in
+	purge)
+		echo "Deleting $QUASSEL_USER user ..."
+		if [ -x /usr/sbin/deluser ]; then
+			deluser --quiet --system $QUASSEL_USER
+		fi
+
+		echo "Deleting $QUASSEL_GROUP group ..."
+		if [ -x /usr/sbin/deluser ]; then
+			delgroup --quiet --system $QUASSEL_GROUP
+		fi
+
+		echo "Deleting /var/cache/quassel ..."
+		rm -rf /var/lib/quassel
+		echo "Deleting /var/log/quassel ..."
+                rm -rf /var/log/quassel
+		;;
+	remove)
+		;;
+	upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+		;;
+	*)
+		echo "postrm called with unknown argument \`$1'" >&2
+		exit 1
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

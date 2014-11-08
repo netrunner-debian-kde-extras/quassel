@@ -1,0 +1,99 @@
+Source: quassel
+Section: net
+Priority: optional
+Maintainer: Thomas Mueller <thomas.mueller@tmit.eu>
+Build-Depends: debhelper (>= 9.20120417), libqt4-dev, cmake, libfontconfig1-dev, libfreetype6-dev, libpng-dev, libsm-dev, libice-dev, libxi-dev, libxrandr-dev, libxrender-dev, zlib1g-dev, libssl-dev, libdbus-1-dev, pkg-kde-tools, kdelibs5-dev, libqca2-dev, qt4-dev-tools, libqtwebkit-dev, libindicate-qt-dev, libdbusmenu-qt-dev
+Homepage: http://www.quassel-irc.org
+Standards-Version: 3.9.5
+
+Package: quassel-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, libqt4-sql-sqlite, lsb-base (>= 3.2-14), openssl
+Description: distributed IRC client - core component
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides only the core component.
+
+Package: quassel-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, quassel-data (= ${source:Version}), dbus-x11, phonon, gawk
+Conflicts: quassel (<< 0.3.1-1), quassel-client-kde4
+Replaces: quassel (<< 0.3.1-1)
+Description: distributed IRC client - Qt-based client component
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides only the client component.
+
+Package: quassel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt4-sql-sqlite, quassel-data (=${source:Version}), dbus-x11, phonon, gawk
+Conflicts: quassel-kde4
+Description: distributed IRC client - Qt-based monolithic core+client
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides the monolithic client. It contains both core and
+ client and can be used like a traditional IRC client, without requiring an
+ external core.
+
+Package: quassel-data
+Architecture: all
+Depends: ${misc:Depends}
+Conflicts: quassel (<< 0.3.1-1), quassel-data-kde4
+Replaces: quassel (<< 0.3.1-1)
+Description: distributed IRC client - shared data (Qt version)
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides files used by the Qt-based Quassel client
+ packages.
+
+Package: quassel-client-kde4
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, quassel-data-kde4 (=${source:Version}), dbus-x11, gawk
+Conflicts: quassel-client
+Description: distributed IRC client - KDE-based client
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides only the client component compiled with KDE4 support.
+
+Package: quassel-kde4
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt4-sql-sqlite, quassel-data-kde4 (= ${source:Version}), dbus-x11, gawk
+Conflicts: quassel
+Description: distributed IRC client - KDE-based monolithic core+client
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides the monolithic client compiled with KDE4 support.
+ It contains both core and client and can be used like a traditional IRC
+ client, without requiring an external core.
+
+Package: quassel-data-kde4
+Architecture: all
+Depends: ${misc:Depends}
+Conflicts: quassel (<< 0.3.1-1), quassel-data
+Replaces: quassel (<< 0.3.1-1)
+Description: distributed IRC client - shared data (KDE4 version)
+ Quassel is a modern, cross-platform, distributed IRC client, meaning that
+ one or more clients can attach to and detach from the central core. It's
+ much like the popular combination of screen and a text-based IRC client
+ such as WeeChat or irssi, but graphical.
+ .
+ This package provides files used by the KDE4-based Quassel client
+ packages.

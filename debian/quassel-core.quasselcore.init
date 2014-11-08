@@ -1,0 +1,129 @@
+#!/bin/sh
+#
+# Copyright (C) 2008 Harald Sitter <apachelogger@ubuntu.com>
+# Copyright (C) 2009 Thomas Mueller <thomas_mueller_ffb@online.de>
+# Copyright (C) 20014 Thomas Mueller <thomas_mueller@tmit.eu>
+#
+# This is free software; you may redistribute it and/or modify
+# it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2,
+# or (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License with
+# the Debian operating system, in /usr/share/common-licenses/GPL;  if
+# not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+# Fifth Floor, Boston, MA  02110-1301, USA
+
+### BEGIN INIT INFO
+# Provides:          quasselcore
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Should-Start:      mysql postgresql
+# Should-Stop:       mysql postgresql
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: distributed IRC client using a central core component
+# Description:       This is the core component of Quassel. A modern,
+#                    cross-platform, distributed IRC client, meaning that one
+#                    (or multiple) client(s) can attach to and detach from this
+#                    central core. It's much like the popular combination
+#                    of screen and a text-based IRC client such as WeeChat.
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+DAEMON=/usr/bin/quasselcore
+NAME=quasselcore
+DESC="distributed IRC core"
+LOGDIR=/var/log/quassel
+
+PIDFILE=/var/run/quasselcore.pid 
+
+# Test if binary exisits
+test -x $DAEMON || exit 0
+
+# Define LSB log_* functions.
+. /lib/lsb/init-functions
+
+DAEMON_OPTS=""
+LOGFILE=$LOGDIR/core.log
+DATADIR=/var/lib/quassel
+DAEMONUSER=quasselcore
+
+# defaulting LOGLEVEL and PORT, just in case /etc/default/$name gets deleted
+LOGLEVEL="Info"
+PORT="4242"
+
+# source default
+if [ -f /etc/default/$NAME ] ; then
+    . /etc/default/$NAME
+fi
+
+# test daemon user
+if [ -n "$DAEMONUSER" ] ; then
+    getent passwd | grep -q "^$DAEMONUSER:"
+    if [ $? -ne 0 ]; then
+        log_failure_msg "The user $DAEMONUSER, required to run $NAME does not exist."
+        exit 1
+    fi
+fi
+
+start_server() {
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile \
+        --background --chuid $DAEMONUSER --exec $DAEMON \
+        -- --logfile=$LOGFILE --loglevel=$LOGLEVEL --configdir=$DATADIR \
+           --port=$PORT \
+           $DAEMON_OPTS
+}
+
+stop_server() {
+    start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --user $DAEMONUSER \
+        --exec $DAEMON
+}
+
+case "$1" in
+  start)
+	log_daemon_msg "Starting $DESC" "$NAME"
+	start_server
+	case "$?" in
+		0) log_end_msg 0 ;;
+		1) log_progress_msg "already started"
+		   log_end_msg 0 ;;
+		*) log_end_msg $? ;;
+	esac
+
+	;;
+  stop)
+	log_daemon_msg "Stopping $DESC" "$NAME"
+	stop_server
+	case "$?" in
+		0) log_end_msg 0 ;;
+		1) log_progress_msg "already stopped"
+		   log_end_msg 0 ;;
+		*) log_end_msg $? ;;
+	esac
+
+	;;
+  reload)
+        log_warning_msg "Reloading $NAME daemon: not implemented, as the daemon"
+        log_warning_msg "cannot re-read the config file (use restart)."
+        ;;
+  restart|force-reload)
+	$0 stop
+	$0 start
+	;;
+  status)
+	status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
+	;;
+  *)
+	echo "Usage: /etc/init.d/$NAME {start|stop|restart|reload|force-reload|status}" >&2
+	exit 3
+	;;
+esac
+
+exit 0

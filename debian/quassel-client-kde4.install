@@ -1,0 +1,2 @@
+debian/kde4-tmp/usr/bin/quasselclient /usr/bin
+debian/kde4-tmp/usr/share/applications/kde4/quasselclient.desktop /usr/share/applications/kde4

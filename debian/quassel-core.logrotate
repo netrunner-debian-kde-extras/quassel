@@ -1,0 +1,10 @@
+/var/log/quassel/core.log {
+        rotate 4
+        weekly
+        compress
+        delaycompress
+        copytruncate
+        missingok
+        notifempty
+}
+
