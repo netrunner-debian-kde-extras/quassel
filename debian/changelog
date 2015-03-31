@@ -1,3 +1,12 @@
+quassel (1:0.10.0-2.3) unstable; urgency=high
+
+  * Non-maintainer upload with maintainer's permission.
+  * Improve the message-splitting algorithm for PRIVMSG and CTCP.  Original
+    patch from Michael Marley, backported by Steinar H. Gunderson.  Fixes
+    CVE-2015-2778 and CVE-2015-2779.  (Closes: #781024)
+
+ -- Olly Betts <olly@survex.com>  Wed, 01 Apr 2015 11:41:28 +1300
+
 quassel (1:0.10.0-2.2) unstable; urgency=high
 
   * Non-maintainer upload.
