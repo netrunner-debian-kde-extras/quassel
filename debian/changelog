@@ -1,3 +1,12 @@
+quassel (1:0.10.0-2.3+deb8u1) jessie-security; urgency=high
+
+  * Fix CVE-2015-3427: SQL injection vulnerability in PostgreSQL backend.
+    (Closes: #783926)
+    - Add debian/patches/CVE-2015-3427.patch, cherry-picked from upstream.
+    - The original issue was CVE-2013-4422 which had an incomplete fix.
+
+ -- Felix Geyer <fgeyer@debian.org>  Sun, 10 May 2015 16:41:30 +0200
+
 quassel (1:0.10.0-2.3) unstable; urgency=high
 
   * Non-maintainer upload with maintainer's permission.
