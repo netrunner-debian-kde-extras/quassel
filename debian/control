@@ -1,7 +1,10 @@
 Source: quassel
 Section: net
 Priority: optional
-Maintainer: Thomas Mueller <thomas.mueller@tmit.eu>
+Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>
+Uploaders: Thomas Mueller <thomas.mueller@tmit.eu>,
+           Felix Geyer <fgeyer@debian.org>,
+           Scott Kitterman <scott@kitterman.com>
 Build-Depends: debhelper (>= 9.20120417), libqt4-dev, cmake, libfontconfig1-dev, libfreetype6-dev, libpng-dev, libsm-dev, libice-dev, libxi-dev, libxrandr-dev, libxrender-dev, zlib1g-dev, libssl-dev, libdbus-1-dev, pkg-kde-tools, kdelibs5-dev, libqca2-dev, qt4-dev-tools, libqtwebkit-dev, libindicate-qt-dev, libdbusmenu-qt-dev
 Homepage: http://www.quassel-irc.org
 Standards-Version: 3.9.5

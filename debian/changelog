@@ -1,3 +1,9 @@
+quassel (1:0.10.0-3) UNRELEASED; urgency=medium
+
+  * Set maintainer to Debian KDE Extras Team.
+
+ -- Felix Geyer <fgeyer@debian.org>  Thu, 03 Sep 2015 18:39:11 +0200
+
 quassel (1:0.10.0-2.4) unstable; urgency=high
 
   * Non-maintainer upload.
