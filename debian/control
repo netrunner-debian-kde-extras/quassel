@@ -8,6 +8,8 @@ Uploaders: Thomas Mueller <thomas.mueller@tmit.eu>,
 Build-Depends: debhelper (>= 9.20120417), libqt4-dev, cmake, libfontconfig1-dev, libfreetype6-dev, libpng-dev, libsm-dev, libice-dev, libxi-dev, libxrandr-dev, libxrender-dev, zlib1g-dev, libssl-dev, libdbus-1-dev, pkg-kde-tools, kdelibs5-dev, libqca2-dev, qt4-dev-tools, libqtwebkit-dev, libindicate-qt-dev, libdbusmenu-qt-dev
 Homepage: http://www.quassel-irc.org
 Standards-Version: 3.9.5
+Vcs-Git: https://anonscm.debian.org/git/pkg-kde/kde-extras/quassel.git
+Vcs-Browser: http://anonscm.debian.org/cgit/pkg-kde/kde-extras/quassel.git/
 
 Package: quassel-core
 Architecture: any

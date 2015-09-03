@@ -1,6 +1,7 @@
 quassel (1:0.10.0-3) UNRELEASED; urgency=medium
 
   * Set maintainer to Debian KDE Extras Team.
+  * Add Vcs control fields pointing to the new git packaging repo.
 
  -- Felix Geyer <fgeyer@debian.org>  Thu, 03 Sep 2015 18:39:11 +0200
 
