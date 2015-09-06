@@ -7,6 +7,7 @@ Uploaders: Thomas Mueller <thomas.mueller@tmit.eu>,
            Scott Kitterman <scott@kitterman.com>
 Build-Depends: debhelper (>= 9.20120417),
                cmake,
+               dh-systemd,
                libqca-qt5-2-dev,
                zlib1g-dev,
                qttools5-dev-tools,

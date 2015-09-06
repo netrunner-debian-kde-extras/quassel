@@ -1,13 +1,14 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --parallel
+	dh $@ --parallel --with systemd
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DEMBED_DATA=OFF -DUSE_QT5=ON -DWITH_KDE=ON
 
 override_dh_install:
 	dh_install --fail-missing
+	install -o root -g root -m 644 debian/quassel-core.quasselcore.systemd debian/quassel-core/lib/systemd/system/quasselcore.service
 
 override_dh_installinit:
 	dh_installinit -r --error-handler=exit --name=quasselcore

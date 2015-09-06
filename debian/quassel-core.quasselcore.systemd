@@ -1,0 +1,16 @@
+[Unit]
+Description=distributed IRC client using a central core component
+Wants=network-online.target postgresql.service
+After=network-online.target postgresql.service
+
+[Service]
+User=quasselcore
+Group=quassel
+WorkingDirectory=/var/lib/quassel
+Environment="DATADIR=/var/lib/quassel" "LOGFILE=/var/log/quassel/core.log" "LOGLEVEL=Info" "PORT=4242"
+EnvironmentFile=-/etc/default/quasselcore
+ExecStart=/usr/bin/quasselcore --configdir=${DATADIR} --logfile=${LOGFILE} --loglevel=${LOGLEVEL} --port=${PORT}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
