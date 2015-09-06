@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <QFileDialog>
+#include <QIcon>
 #include <QUrl>
 
 #include <phonon/mediaobject.h>
@@ -27,7 +28,6 @@
 #include "phononnotificationbackend.h"
 
 #include "clientsettings.h"
-#include "iconloader.h"
 #include "mainwin.h"
 #include "qtui.h"
 
@@ -112,9 +112,9 @@ PhononNotificationBackend::ConfigWidget::ConfigWidget(QWidget *parent)
 {
     ui.setupUi(this);
     _audioAvailable = !Phonon::BackendCapabilities::availableAudioOutputDevices().isEmpty();
-    ui.enabled->setIcon(SmallIcon("media-playback-start"));
-    ui.play->setIcon(SmallIcon("media-playback-start"));
-    ui.open->setIcon(SmallIcon("document-open"));
+    ui.enabled->setIcon(QIcon::fromTheme("media-playback-start"));
+    ui.play->setIcon(QIcon::fromTheme("media-playback-start"));
+    ui.open->setIcon(QIcon::fromTheme("document-open"));
 
     connect(ui.enabled, SIGNAL(toggled(bool)), SLOT(widgetChanged()));
     connect(ui.filename, SIGNAL(textChanged(const QString &)), SLOT(widgetChanged()));

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -169,6 +169,7 @@ void ClientAuthHandler::onSocketConnected()
         _probing = true;
 
         QDataStream stream(socket()); // stream handles the endianness for us
+        stream.setVersion(QDataStream::Qt_4_2);
 
         quint32 magic = Protocol::magic;
 #ifdef HAVE_SSL
@@ -283,7 +284,7 @@ void ClientAuthHandler::startRegistration()
     useSsl = _account.useSsl();
 #endif
 
-    _peer->dispatch(RegisterClient(Quassel::buildInfo().fancyVersionString, useSsl));
+    _peer->dispatch(RegisterClient(Quassel::buildInfo().fancyVersionString, Quassel::buildInfo().buildDate, useSsl));
 }
 
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,9 +23,12 @@
 #include "coreirclisthelper.h"
 #include "corenetwork.h"
 #include "coresession.h"
+#include "coretransfer.h"
+#include "coretransfermanager.h"
 #include "ctcpevent.h"
 #include "ircevent.h"
 #include "ircuser.h"
+#include "logger.h"
 #include "messageevent.h"
 #include "netsplit.h"
 #include "quassel.h"
@@ -124,7 +127,7 @@ void CoreSessionEventProcessor::processIrcEventAuthenticate(IrcEvent *e)
         construct.append(net->saslAccount());
         construct.append(QChar(QChar::Null));
         construct.append(net->saslPassword());
-        QByteArray saslData = QByteArray(construct.toAscii().toBase64());
+        QByteArray saslData = QByteArray(construct.toLatin1().toBase64());
         saslData.prepend("AUTHENTICATE ");
         net->putRawLine(saslData);
 #ifdef HAVE_SSL
@@ -477,14 +480,10 @@ void CoreSessionEventProcessor::processKeyEvent(KeyEvent *e)
 
 
 /* RPL_WELCOME */
-void CoreSessionEventProcessor::processIrcEvent001(IrcEvent *e)
+void CoreSessionEventProcessor::processIrcEvent001(IrcEventNumeric *e)
 {
-    if (!checkParamCount(e, 1))
-        return;
-
-    QString myhostmask = e->params().at(0).section(' ', -1, -1);
     e->network()->setCurrentServer(e->prefix());
-    e->network()->setMyNick(nickFromMask(myhostmask));
+    e->network()->setMyNick(e->target());
 }
 
 
@@ -1011,6 +1010,67 @@ void CoreSessionEventProcessor::handleCtcpClientinfo(CtcpEvent *e)
     supportedHandlers << handler.toUpper();
     qSort(supportedHandlers);
     e->setReply(supportedHandlers.join(" "));
+}
+
+
+// http://www.irchelp.org/irchelp/rfc/ctcpspec.html
+// http://en.wikipedia.org/wiki/Direct_Client-to-Client
+void CoreSessionEventProcessor::handleCtcpDcc(CtcpEvent *e)
+{
+    // DCC support is unfinished, experimental and potentially dangerous, so make it opt-in
+    if (!Quassel::isOptionSet("enable-experimental-dcc")) {
+        quInfo() << "DCC disabled, start core with --enable-experimental-dcc if you really want to try it out";
+        return;
+    }
+
+    // normal:  SEND <filename> <ip> <port> [<filesize>]
+    // reverse: SEND <filename> <ip> 0 <filesize> <token>
+    QStringList params = e->param().split(' ');
+    if (params.count()) {
+        QString cmd = params[0].toUpper();
+        if (cmd == "SEND") {
+            if (params.count() < 4) {
+                qWarning() << "Invalid DCC SEND request:" << e;  // TODO emit proper error to client
+                return;
+            }
+            QString filename = params[1];
+            QHostAddress address;
+            quint16 port = params[3].toUShort();
+            quint64 size = 0;
+            QString numIp = params[2]; // this is either IPv4 as a 32 bit value, or IPv6 (which always contains a colon)
+            if (numIp.contains(':')) { // IPv6
+                if (!address.setAddress(numIp)) {
+                    qWarning() << "Invalid IPv6:" << numIp;
+                    return;
+                }
+            }
+            else {
+                address.setAddress(numIp.toUInt());
+            }
+
+            if (port == 0) { // Reverse DCC is indicated by a 0 port
+                emit newEvent(new MessageEvent(Message::Error, e->network(), tr("Reverse DCC SEND not supported"), e->prefix(), e->target(), Message::None, e->timestamp()));
+                return;
+            }
+            if (port < 1024) {
+                qWarning() << "Privileged port requested:" << port; // FIXME ask user if this is ok
+            }
+
+
+            if (params.count() > 4) { // filesize is optional
+                size = params[4].toULong();
+            }
+
+            // TODO: check if target is the right thing to use for the partner
+            CoreTransfer *transfer = new CoreTransfer(Transfer::Receive, e->target(), filename, address, port, size, this);
+            coreSession()->signalProxy()->synchronize(transfer);
+            coreSession()->transferManager()->addTransfer(transfer);
+        }
+        else {
+            emit newEvent(new MessageEvent(Message::Error, e->network(), tr("DCC %1 not supported").arg(cmd), e->prefix(), e->target(), Message::None, e->timestamp()));
+            return;
+        }
+    }
 }
 
 

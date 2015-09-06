@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,7 +44,7 @@ WebPreviewItem::WebPreviewItem(const QUrl &url)
 
     qreal xScale = (_boundingRect.width() - 2 * frameWidth) / webView->width();
     qreal yScale = (_boundingRect.height() - 2 * frameWidth) / webView->height();
-    proxyItem->scale(xScale, yScale);
+    proxyItem->setTransform(QTransform::fromScale(xScale, yScale), true);
     proxyItem->setPos(frameWidth, frameWidth);
 
     setZValue(30);

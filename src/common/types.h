@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,14 +24,10 @@
 #include <QDebug>
 #include <QString>
 #include <QVariant>
+#include <QDataStream>
 #include <QTextStream>
 #include <QHostAddress>
 #include <QDataStream>
-
-// We need to special-case Peer* in attached signals/slots, so typedef it for the meta type system
-class Peer;
-typedef Peer * PeerPtr;
-Q_DECLARE_METATYPE(PeerPtr)
 
 class SignedId
 {

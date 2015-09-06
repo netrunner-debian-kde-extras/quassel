@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,15 +19,16 @@
  ***************************************************************************/
 
 #include <QHeaderView>
+#include <QIcon>
 #include <QMessageBox>
 #include <QTextCodec>
 
 #include "networkssettingspage.h"
 
 #include "client.h"
-#include "iconloader.h"
 #include "identity.h"
 #include "network.h"
+#include "presetnetworks.h"
 #include "settingspagedlg.h"
 #include "util.h"
 
@@ -51,21 +52,21 @@ NetworksSettingsPage::NetworksSettingsPage(QWidget *parent)
 #endif
 
     // set up icons
-    ui.renameNetwork->setIcon(SmallIcon("edit-rename"));
-    ui.addNetwork->setIcon(SmallIcon("list-add"));
-    ui.deleteNetwork->setIcon(SmallIcon("edit-delete"));
-    ui.addServer->setIcon(SmallIcon("list-add"));
-    ui.deleteServer->setIcon(SmallIcon("edit-delete"));
-    ui.editServer->setIcon(SmallIcon("configure"));
-    ui.upServer->setIcon(SmallIcon("go-up"));
-    ui.downServer->setIcon(SmallIcon("go-down"));
-    ui.editIdentities->setIcon(SmallIcon("configure"));
+    ui.renameNetwork->setIcon(QIcon::fromTheme("edit-rename"));
+    ui.addNetwork->setIcon(QIcon::fromTheme("list-add"));
+    ui.deleteNetwork->setIcon(QIcon::fromTheme("edit-delete"));
+    ui.addServer->setIcon(QIcon::fromTheme("list-add"));
+    ui.deleteServer->setIcon(QIcon::fromTheme("edit-delete"));
+    ui.editServer->setIcon(QIcon::fromTheme("configure"));
+    ui.upServer->setIcon(QIcon::fromTheme("go-up"));
+    ui.downServer->setIcon(QIcon::fromTheme("go-down"));
+    ui.editIdentities->setIcon(QIcon::fromTheme("configure"));
 
     _ignoreWidgetChanges = false;
 
-    connectedIcon = SmallIcon("network-connect");
-    connectingIcon = SmallIcon("network-wired"); // FIXME network-connecting
-    disconnectedIcon = SmallIcon("network-disconnect");
+    connectedIcon = QIcon::fromTheme("network-connect");
+    connectingIcon = QIcon::fromTheme("network-wired"); // FIXME network-connecting
+    disconnectedIcon = QIcon::fromTheme("network-disconnect");
 
     foreach(int mib, QTextCodec::availableMibs()) {
         QByteArray codec = QTextCodec::codecForMib(mib)->name();
@@ -496,7 +497,7 @@ void NetworksSettingsPage::displayNetwork(NetworkId id)
         foreach(Network::Server server, info.serverList) {
             QListWidgetItem *item = new QListWidgetItem(QString("%1:%2").arg(server.host).arg(server.port));
             if (server.useSsl)
-                item->setIcon(SmallIcon("document-encrypt"));
+                item->setIcon(QIcon::fromTheme("document-encrypt"));
             ui.serverList->addItem(item);
         }
         //setItemState(id);
@@ -783,10 +784,10 @@ IdentityId NetworksSettingsPage::defaultIdentity() const
 NetworkAddDlg::NetworkAddDlg(const QStringList &exist, QWidget *parent) : QDialog(parent), existing(exist)
 {
     ui.setupUi(this);
-    ui.useSSL->setIcon(SmallIcon("document-encrypt"));
+    ui.useSSL->setIcon(QIcon::fromTheme("document-encrypt"));
 
     // read preset networks
-    QStringList networks = Network::presetNetworks();
+    QStringList networks = PresetNetworks::names();
     foreach(QString s, existing)
     networks.removeAll(s);
     if (networks.count())
@@ -810,7 +811,7 @@ NetworkInfo NetworkAddDlg::networkInfo() const
         return info;
     }
     else
-        return Network::networkInfoFromPreset(ui.presetList->currentText());
+        return PresetNetworks::networkInfo(ui.presetList->currentText());
 }
 
 
@@ -862,17 +863,36 @@ void NetworkEditDlg::on_networkEdit_textChanged(const QString &text)
 ServerEditDlg::ServerEditDlg(const Network::Server &server, QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
-    ui.useSSL->setIcon(SmallIcon("document-encrypt"));
+    ui.useSSL->setIcon(QIcon::fromTheme("document-encrypt"));
     ui.host->setText(server.host);
+    ui.host->setFocus();
     ui.port->setValue(server.port);
     ui.password->setText(server.password);
     ui.useSSL->setChecked(server.useSsl);
+    ui.sslVersion->setCurrentIndex(server.sslVersion);
     ui.useProxy->setChecked(server.useProxy);
     ui.proxyType->setCurrentIndex(server.proxyType == QNetworkProxy::Socks5Proxy ? 0 : 1);
     ui.proxyHost->setText(server.proxyHost);
     ui.proxyPort->setValue(server.proxyPort);
     ui.proxyUsername->setText(server.proxyUser);
     ui.proxyPassword->setText(server.proxyPass);
+
+    // This is a dirty hack to display the core->IRC SSL protocol dropdown
+    // only if the core won't use autonegotiation to determine the best
+    // protocol.  When autonegotiation was introduced, it would have been
+    // a good idea to use the CoreFeatures enum to accomplish this.
+    // However, since multiple versions have been released since then, that
+    // is no longer possible.  Instead, we rely on the fact that the
+    // Datastream protocol was introduced in the same version (0.10) as SSL
+    // autonegotiation.  Because of that, we can display the dropdown only
+    // if the Legacy protocol is in use.  If any other RemotePeer protocol
+    // is in use, that means a newer protocol is in use and therefore the
+    // core will use autonegotiation.
+    if (Client::coreConnection()->peer()->protocol() != Protocol::LegacyProtocol) {
+        ui.label_3->hide();
+        ui.sslVersion->hide();
+    }
+
     on_host_textChanged();
 }
 
@@ -880,6 +900,7 @@ ServerEditDlg::ServerEditDlg(const Network::Server &server, QWidget *parent) : Q
 Network::Server ServerEditDlg::serverData() const
 {
     Network::Server server(ui.host->text().trimmed(), ui.port->value(), ui.password->text(), ui.useSSL->isChecked());
+    server.sslVersion = ui.sslVersion->currentIndex();
     server.useProxy = ui.useProxy->isChecked();
     server.proxyType = ui.proxyType->currentIndex() == 0 ? QNetworkProxy::Socks5Proxy : QNetworkProxy::HttpProxy;
     server.proxyHost = ui.proxyHost->text();

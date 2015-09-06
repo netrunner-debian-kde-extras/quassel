@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,6 +18,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#include <QIcon>
 #include <QLayout>
 #include <QKeyEvent>
 #include <QMenu>
@@ -32,7 +33,6 @@
 #include "chatviewsearchcontroller.h"
 #include "chatviewsettings.h"
 #include "client.h"
-#include "iconloader.h"
 #include "multilineedit.h"
 #include "qtui.h"
 #include "settings.h"
@@ -77,16 +77,16 @@ BufferWidget::BufferWidget(QWidget *parent)
 
     Action *zoomInChatview = coll->add<Action>("ZoomInChatView", this, SLOT(zoomIn()));
     zoomInChatview->setText(tr("Zoom In"));
-    zoomInChatview->setIcon(SmallIcon("zoom-in"));
+    zoomInChatview->setIcon(QIcon::fromTheme("zoom-in"));
     zoomInChatview->setShortcut(QKeySequence::ZoomIn);
 
     Action *zoomOutChatview = coll->add<Action>("ZoomOutChatView", this, SLOT(zoomOut()));
-    zoomOutChatview->setIcon(SmallIcon("zoom-out"));
+    zoomOutChatview->setIcon(QIcon::fromTheme("zoom-out"));
     zoomOutChatview->setText(tr("Zoom Out"));
     zoomOutChatview->setShortcut(QKeySequence::ZoomOut);
 
     Action *zoomOriginalChatview = coll->add<Action>("ZoomOriginalChatView", this, SLOT(zoomOriginal()));
-    zoomOriginalChatview->setIcon(SmallIcon("zoom-original"));
+    zoomOriginalChatview->setIcon(QIcon::fromTheme("zoom-original"));
     zoomOriginalChatview->setText(tr("Actual Size"));
     //zoomOriginalChatview->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0)); // used for RTS switching
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -53,7 +53,14 @@ QSqlDatabase AbstractSqlStorage::logDb()
     if (!_connectionPool.contains(QThread::currentThread()))
         addConnectionToPool();
 
-    return QSqlDatabase::database(_connectionPool[QThread::currentThread()]->name());
+    QSqlDatabase db = QSqlDatabase::database(_connectionPool[QThread::currentThread()]->name(),false);
+
+    if (!db.isOpen()) {
+        qWarning() << "Database connection" << displayName() << "for thread" << QThread::currentThread() << "was lost, attempting to reconnect...";
+        dbConnect(db);
+    }
+
+    return db;
 }
 
 
@@ -90,6 +97,12 @@ void AbstractSqlStorage::addConnectionToPool()
         db.setPassword(password());
     }
 
+    dbConnect(db);
+}
+
+
+void AbstractSqlStorage::dbConnect(QSqlDatabase &db)
+{
     if (!db.open()) {
         quWarning() << "Unable to open database" << displayName() << "for thread" << QThread::currentThread();
         quWarning() << "-" << db.lastError().text();
@@ -409,7 +422,7 @@ void AbstractSqlMigrator::dumpStatus()
     qWarning() << "  bound Values:";
     QList<QVariant> list = boundValues();
     for (int i = 0; i < list.size(); ++i)
-        qWarning() << i << ": " << list.at(i).toString().toAscii().data();
+        qWarning() << i << ": " << list.at(i).toString().toLatin1().data();
     qWarning() << "  Error Number:"   << lastError().number();
     qWarning() << "  Error Message:"   << lastError().text();
 }

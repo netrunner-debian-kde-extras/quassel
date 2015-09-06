@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -87,7 +87,7 @@ QStringList IrcUser::channels() const
 
 void IrcUser::setCodecForEncoding(const QString &name)
 {
-    setCodecForEncoding(QTextCodec::codecForName(name.toAscii()));
+    setCodecForEncoding(QTextCodec::codecForName(name.toLatin1()));
 }
 
 
@@ -99,7 +99,7 @@ void IrcUser::setCodecForEncoding(QTextCodec *codec)
 
 void IrcUser::setCodecForDecoding(const QString &name)
 {
-    setCodecForDecoding(QTextCodec::codecForName(name.toAscii()));
+    setCodecForDecoding(QTextCodec::codecForName(name.toLatin1()));
 }
 
 

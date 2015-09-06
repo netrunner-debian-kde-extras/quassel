@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -43,9 +43,7 @@ MultiLineEdit::MultiLineEdit(QWidget *parent)
     _emacsMode(false),
     _lastDocumentHeight(-1)
 {
-#if QT_VERSION >= 0x040500
-    document()->setDocumentMargin(0); // new in Qt 4.5 and we really don't want it here
-#endif
+    document()->setDocumentMargin(0);
 
     setAcceptRichText(false);
 #ifdef HAVE_KDE
@@ -296,18 +294,7 @@ bool MultiLineEdit::event(QEvent *e)
 
 void MultiLineEdit::keyPressEvent(QKeyEvent *event)
 {
-    // Workaround the fact that Qt < 4.5 doesn't know InsertLineSeparator yet
-#if QT_VERSION >= 0x040500
     if (event == QKeySequence::InsertLineSeparator) {
-#else
-
-# ifdef Q_WS_MAC
-    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && event->modifiers() & Qt::META) {
-# else
-    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && event->modifiers() & Qt::SHIFT) {
-# endif
-#endif
-
         if (_mode == SingleLine) {
             event->accept();
             on_returnPressed();
@@ -564,22 +551,18 @@ QString MultiLineEdit::convertRichtextToMircCodes()
 
         cursor.clearSelection();
     }
-    if (color) {
-        color = false;
+
+    if (color)
         mircText.append('\x03');
-    }
-    if (underline) {
-        underline = false;
+
+    if (underline)
         mircText.append('\x1f');
-    }
-    if (italic) {
-        italic = false;
+
+    if (italic)
         mircText.append('\x1d');
-    }
-    if (bold) {
-        bold = false;
+
+    if (bold)
         mircText.append('\x02');
-    }
 
     return mircText;
 }
@@ -718,7 +701,11 @@ void MultiLineEdit::on_textChanged()
                 QString msg = tr("Do you really want to paste %n line(s)?", "", lines.count());
                 msg += "<p>";
                 for (int i = 0; i < 4; i++) {
+#if QT_VERSION < 0x050000
                     msg += Qt::escape(lines[i].left(40));
+#else
+                    msg += lines[i].left(40).toHtmlEscaped();
+#endif
                     if (lines[i].count() > 40)
                         msg += "...";
                     msg += "<br />";
@@ -726,7 +713,7 @@ void MultiLineEdit::on_textChanged()
                 msg += "...</p>";
                 QMessageBox question(QMessageBox::NoIcon, tr("Paste Protection"), msg, QMessageBox::Yes|QMessageBox::No);
                 question.setDefaultButton(QMessageBox::No);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
                 question.setWindowFlags(question.windowFlags() | Qt::Sheet);
 #endif
                 if (question.exec() != QMessageBox::Yes)

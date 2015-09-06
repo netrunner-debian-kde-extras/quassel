@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,6 +30,7 @@ namespace Protocol {
 const quint32 magic = 0x42b33f00;
 
 enum Type {
+    InternalProtocol = 0x00,
     LegacyProtocol = 0x01,
     DataStreamProtocol = 0x02
 };
@@ -56,11 +57,13 @@ struct HandshakeMessage {
 
 struct RegisterClient : public HandshakeMessage
 {
-    inline RegisterClient(const QString &clientVersion, bool sslSupported = false)
+    inline RegisterClient(const QString &clientVersion, const QString &buildDate, bool sslSupported = false)
     : clientVersion(clientVersion)
+    , buildDate(buildDate)
     , sslSupported(sslSupported) {}
 
     QString clientVersion;
+    QString buildDate;
 
     // this is only used by the LegacyProtocol in compat mode
     bool sslSupported;
@@ -78,12 +81,12 @@ struct ClientDenied : public HandshakeMessage
 
 struct ClientRegistered : public HandshakeMessage
 {
-    inline ClientRegistered(quint32 coreFeatures, bool coreConfigured, const QVariantList &backendInfo, bool sslSupported, const QDateTime &coreStartTime)
+    inline ClientRegistered(quint32 coreFeatures, bool coreConfigured, const QVariantList &backendInfo, bool sslSupported, const QString &coreInfo)
     : coreFeatures(coreFeatures)
     , coreConfigured(coreConfigured)
     , backendInfo(backendInfo)
     , sslSupported(sslSupported)
-    , coreStartTime(coreStartTime)
+    , coreInfo(coreInfo)
     {}
 
     quint32 coreFeatures;
@@ -92,7 +95,7 @@ struct ClientRegistered : public HandshakeMessage
 
     // this is only used by the LegacyProtocol in compat mode
     bool sslSupported;
-    QDateTime coreStartTime;
+    QString coreInfo;
 };
 
 

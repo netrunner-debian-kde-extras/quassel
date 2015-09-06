@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,6 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
+
+#include <QHostAddress>
 
 #include "authhandler.h"
 
@@ -40,6 +42,16 @@ void AuthHandler::setSocket(QTcpSocket *socket)
     _socket = socket;
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
     connect(socket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
+}
+
+
+bool AuthHandler::isLocal() const
+{
+    if (socket()) {
+        if (socket()->peerAddress() == QHostAddress::LocalHost || socket()->peerAddress() == QHostAddress::LocalHostIPv6)
+            return true;
+    }
+    return false;
 }
 
 

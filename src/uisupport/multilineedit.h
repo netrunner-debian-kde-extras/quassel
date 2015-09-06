@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,8 +24,11 @@
 #include <QKeyEvent>
 #include <QHash>
 
-#ifdef HAVE_KDE
+#ifdef HAVE_KDE4
 #  include <KDE/KTextEdit>
+#  define MultiLineEditParent KTextEdit
+#elif defined HAVE_KF5
+#  include <KTextWidgets/KTextEdit>
 #  define MultiLineEditParent KTextEdit
 #else
 #  include <QTextEdit>

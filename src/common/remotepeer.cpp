@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -252,11 +252,7 @@ void RemotePeer::handle(const HeartBeat &heartBeat)
 void RemotePeer::handle(const HeartBeatReply &heartBeatReply)
 {
     _heartBeatCount = 0;
-#if QT_VERSION >= 0x040700
     emit lagUpdated(heartBeatReply.timestamp.msecsTo(QDateTime::currentDateTime().toUTC()) / 2);
-#else
-    emit lagUpdated(heartBeatReply.timestamp.time().msecsTo(QDateTime::currentDateTime().toUTC().time()) / 2);
-#endif
 }
 
 

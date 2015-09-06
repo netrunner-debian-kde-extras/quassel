@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,20 +18,16 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef CORECONNECTION_H_
-#define CORECONNECTION_H_
+#pragma once
 
-#include "QPointer"
-#include "QTimer"
+#include <QNetworkConfigurationManager>
+#include <QPointer>
+#include <QTimer>
 
 #ifdef HAVE_SSL
 #  include <QSslSocket>
 #else
 #  include <QTcpSocket>
-#endif
-
-#ifdef HAVE_KDE
-#  include <Solid/Networking>
 #endif
 
 #include "coreaccount.h"
@@ -76,6 +72,8 @@ public:
 
     //! Check if we consider the last connect as reconnect
     bool wasReconnect() const { return _wasReconnect; }
+
+    QPointer<Peer> peer() { return _peer; }
 
 public slots:
     bool connectToCore(AccountId = 0);
@@ -148,9 +146,7 @@ private slots:
     void reconnectIntervalChanged(const QVariant &interval);
     void reconnectTimeout();
 
-#ifdef HAVE_KDE
-    void solidNetworkStatusChanged(Solid::Networking::Status status);
-#endif
+    void onlineStateChanged(bool isOnline);
 
 private:
     QPointer<ClientAuthHandler> _authHandler;
@@ -171,6 +167,8 @@ private:
     CoreAccount _account;
     CoreAccountModel *accountModel() const;
 
+    QPointer<QNetworkConfigurationManager> _qNetworkConfigurationManager;
+
     friend class CoreConfigWizard;
 };
 
@@ -186,5 +184,3 @@ inline QString CoreConnection::progressText() const { return _progressText; }
 inline CoreConnection::ConnectionState CoreConnection::state() const { return _state; }
 inline bool CoreConnection::isConnected() const { return state() >= Connected; }
 inline CoreAccount CoreConnection::currentAccount() const { return _account; }
-
-#endif

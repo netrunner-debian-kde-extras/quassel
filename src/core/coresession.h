@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,6 +27,7 @@
 #include "corecoreinfo.h"
 #include "corealiasmanager.h"
 #include "coreignorelistmanager.h"
+#include "peer.h"
 #include "protocol.h"
 #include "message.h"
 #include "storage.h"
@@ -39,12 +40,12 @@ class CoreIrcListHelper;
 class CoreNetwork;
 class CoreNetworkConfig;
 class CoreSessionEventProcessor;
+class CoreTransferManager;
 class CtcpParser;
 class EventManager;
 class EventStringifier;
 class InternalPeer;
 class IrcParser;
-class Peer;
 class MessageEvent;
 class NetworkConnection;
 class RemotePeer;
@@ -85,6 +86,8 @@ public:
     inline CoreIrcListHelper *ircListHelper() const { return _ircListHelper; }
 
     inline CoreIgnoreListManager *ignoreListManager() { return &_ignoreListManager; }
+    inline CoreTransferManager *transferManager() const { return _transferManager; }
+
 //   void attachNetworkConnection(NetworkConnection *conn);
 
     //! Return necessary data for restoring the session after restarting the core
@@ -124,6 +127,8 @@ public slots:
      */
     void renameBuffer(const NetworkId &networkId, const QString &newName, const QString &oldName);
 
+    void changePassword(PeerPtr peer, const QString &userName, const QString &oldPassword, const QString &newPassword);
+
     QHash<QString, QString> persistentChannels(NetworkId) const;
 
     //! Marks us away (or unaway) on all networks
@@ -154,6 +159,8 @@ signals:
     void networkCreated(NetworkId);
     void networkRemoved(NetworkId);
     void networkDisconnected(NetworkId);
+
+    void passwordChanged(PeerPtr peer, bool success);
 
 protected:
     virtual void customEvent(QEvent *event);
@@ -199,6 +206,7 @@ private:
     CoreIrcListHelper *_ircListHelper;
     CoreNetworkConfig *_networkConfig;
     CoreCoreInfo _coreInfo;
+    CoreTransferManager *_transferManager;
 
     EventManager *_eventManager;
     EventStringifier *_eventStringifier; // should eventually move into client

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,6 +34,7 @@
 #include "corenetwork.h"
 #include "corenetworkconfig.h"
 #include "coresessioneventprocessor.h"
+#include "coretransfermanager.h"
 #include "coreusersettings.h"
 #include "ctcpparser.h"
 #include "eventstringifier.h"
@@ -66,6 +67,7 @@ CoreSession::CoreSession(UserId uid, bool restoreState, QObject *parent)
     _ircListHelper(new CoreIrcListHelper(this)),
     _networkConfig(new CoreNetworkConfig("GlobalNetworkConfig", this)),
     _coreInfo(this),
+    _transferManager(new CoreTransferManager(this)),
     _eventManager(new CoreEventManager(this)),
     _eventStringifier(new EventStringifier(this)),
     _sessionEventProcessor(new CoreSessionEventProcessor(this)),
@@ -98,6 +100,9 @@ CoreSession::CoreSession(UserId uid, bool restoreState, QObject *parent)
     p->attachSlot(SIGNAL(createNetwork(const NetworkInfo &, const QStringList &)), this, SLOT(createNetwork(const NetworkInfo &, const QStringList &)));
     p->attachSlot(SIGNAL(removeNetwork(NetworkId)), this, SLOT(removeNetwork(NetworkId)));
 
+    p->attachSlot(SIGNAL(changePassword(PeerPtr,QString,QString,QString)), this, SLOT(changePassword(PeerPtr,QString,QString,QString)));
+    p->attachSignal(this, SIGNAL(passwordChanged(PeerPtr,bool)));
+
     loadSettings();
     initScriptEngine();
 
@@ -120,6 +125,7 @@ CoreSession::CoreSession(UserId uid, bool restoreState, QObject *parent)
     p->synchronize(networkConfig());
     p->synchronize(&_coreInfo);
     p->synchronize(&_ignoreListManager);
+    p->synchronize(transferManager());
     // Restore session state
     if (restoreState)
         restoreSessionState();
@@ -318,8 +324,8 @@ void CoreSession::processMessages()
             bufferInfo = Core::bufferInfo(user(), rawMsg.networkId, BufferInfo::StatusBuffer, "");
         }
         Message msg(bufferInfo, rawMsg.type, rawMsg.text, rawMsg.sender, rawMsg.flags);
-        Core::storeMessage(msg);
-        emit displayMsg(msg);
+        if(Core::storeMessage(msg))
+            emit displayMsg(msg);
     }
     else {
         QHash<NetworkId, QHash<QString, BufferInfo> > bufferInfoCache;
@@ -361,10 +367,11 @@ void CoreSession::processMessages()
             messages << msg;
         }
 
-        Core::storeMessages(messages);
-        // FIXME: extend protocol to a displayMessages(MessageList)
-        for (int i = 0; i < messages.count(); i++) {
-            emit displayMsg(messages[i]);
+        if(Core::storeMessages(messages)) {
+            // FIXME: extend protocol to a displayMessages(MessageList)
+            for (int i = 0; i < messages.count(); i++) {
+                emit displayMsg(messages[i]);
+            }
         }
     }
     _processMessages = false;
@@ -633,4 +640,14 @@ void CoreSession::globalAway(const QString &msg)
 
         net->userInputHandler()->issueAway(msg, false /* no force away */);
     }
+}
+
+void CoreSession::changePassword(PeerPtr peer, const QString &userName, const QString &oldPassword, const QString &newPassword)
+{
+    bool success = false;
+    UserId uid = Core::validateUser(userName, oldPassword);
+    if (uid.isValid() && uid == user())
+        success = Core::changeUserPassword(uid, newPassword);
+
+    emit passwordChanged(peer, success);
 }

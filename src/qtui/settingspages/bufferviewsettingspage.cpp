@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,10 +20,10 @@
 
 #include "bufferviewsettingspage.h"
 
+#include <QIcon>
 #include <QMessageBox>
 
 #include "client.h"
-#include "iconloader.h"
 #include "network.h"
 #include "bufferviewconfig.h"
 #include "bufferviewfilter.h"
@@ -43,9 +43,9 @@ BufferViewSettingsPage::BufferViewSettingsPage(QWidget *parent)
     if (!(Client::coreFeatures() & Quassel::HideInactiveNetworks))
         ui.hideInactiveNetworks->hide();
 
-    ui.renameBufferView->setIcon(SmallIcon("edit-rename"));
-    ui.addBufferView->setIcon(SmallIcon("list-add"));
-    ui.deleteBufferView->setIcon(SmallIcon("edit-delete"));
+    ui.renameBufferView->setIcon(QIcon::fromTheme("edit-rename"));
+    ui.addBufferView->setIcon(QIcon::fromTheme("list-add"));
+    ui.deleteBufferView->setIcon(QIcon::fromTheme("edit-delete"));
 
     reset();
 

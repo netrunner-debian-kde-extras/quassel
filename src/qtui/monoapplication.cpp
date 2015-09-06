@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,9 +31,9 @@ MonolithicApplication::MonolithicApplication(int &argc, char **argv)
     _internalInitDone(false)
 {
     _internal = new CoreApplicationInternal(); // needed for parser options
-#if defined(HAVE_KDE) || defined(Q_OS_MAC)
+#if defined(HAVE_KDE4) || defined(Q_OS_MAC)
     disableCrashhandler();
-#endif /* HAVE_KDE || Q_OS_MAC */
+#endif /* HAVE_KDE4 || Q_OS_MAC */
     setRunMode(Quassel::Monolithic);
 }
 

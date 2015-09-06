@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -121,8 +121,8 @@ QString decodeString(const QByteArray &input, QTextCodec *codec)
         //qDebug() << "Detected utf8:" << s;
         return s;
     }
-    //QTextCodec *codec = QTextCodec::codecForName(encoding.toAscii());
-    if (!codec) return QString::fromAscii(input);
+    //QTextCodec *codec = QTextCodec::codecForName(encoding.toLatin1());
+    if (!codec) return QString::fromLatin1(input);
     return codec->toUnicode(input);
 }
 
