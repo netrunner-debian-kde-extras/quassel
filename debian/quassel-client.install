@@ -1,2 +1,2 @@
-debian/tmp/usr/bin/quasselclient
-debian/tmp/usr/share/applications/quasselclient.desktop
+usr/bin/quasselclient
+usr/share/applications/quasselclient.desktop
