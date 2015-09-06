@@ -10,12 +10,12 @@ QUASSEL_USER=quasselcore
 case "$1" in
 	purge)
 		echo "Deleting $QUASSEL_USER user ..."
-		if [ -x /usr/sbin/deluser ]; then
+		if which deluser > /dev/null; then
 			deluser --quiet --system $QUASSEL_USER
 		fi
 
 		echo "Deleting $QUASSEL_GROUP group ..."
-		if [ -x /usr/sbin/deluser ]; then
+		if which delgroup > /dev/null; then
 			delgroup --quiet --system $QUASSEL_GROUP
 		fi
 

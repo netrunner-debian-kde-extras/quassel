@@ -18,6 +18,7 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
   * Pass --fail-missing to dh_install.
   * Create the SSL certificate as user quasselcore to avoid a symlink race
     condition. (Closes: #753737)
+  * Stop hardcoding the path to deluser / delgroup in postrm.
 
   [ Scott Kitterman ]
   * Add systemd service file and associated changes for quasselcore.
