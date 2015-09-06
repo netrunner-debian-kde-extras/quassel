@@ -6,5 +6,8 @@
 override_dh_auto_configure:
 	dh_auto_configure -- -DEMBED_DATA=OFF -DUSE_QT5=ON -DWITH_KDE=ON
 
+override_dh_install:
+	dh_install --fail-missing
+
 override_dh_installinit:
 	dh_installinit -r --error-handler=exit --name=quasselcore
