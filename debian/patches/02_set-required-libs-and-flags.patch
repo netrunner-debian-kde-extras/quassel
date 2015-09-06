@@ -1,0 +1,14 @@
+Description: Fix detection of OpenSSL when building against Qt5.
+Origin: https://build.opensuse.org/package/view_file/openSUSE:Factory/quassel/quassel-set-required-libs-and-flags.patch?expand=1
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -484,6 +484,8 @@ endif()
+ # a small test program checking the defines. This works for both Qt4 and Qt5.
+ cmake_push_check_state(RESET)
+ set(CMAKE_REQUIRED_INCLUDES ${QT_INCLUDES} ${Qt5Core_INCLUDE_DIRS})
++set(CMAKE_REQUIRED_FLAGS ${Qt5Core_EXECUTABLE_COMPILE_FLAGS})
++set(CMAKE_REQUIRED_LIBRARIES ${Qt5Core_LIBRARIES})
+ check_cxx_source_compiles("
+     #include \"qglobal.h\"
+     #if defined QT_NO_OPENSSL || defined QT_NO_SSL

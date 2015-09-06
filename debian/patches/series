@@ -1,1 +1,2 @@
 01_default_network_channel.patch
+02_set-required-libs-and-flags.patch
