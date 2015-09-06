@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -76,11 +76,16 @@ protected:
     virtual void keyPressEvent(QKeyEvent *);
     virtual void dropEvent(QDropEvent *event);
     virtual void rowsInserted(const QModelIndex &parent, int start, int end);
-    virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     virtual void wheelEvent(QWheelEvent *);
     virtual QSize sizeHint() const;
     virtual void focusInEvent(QFocusEvent *event) { QAbstractScrollArea::focusInEvent(event); }
     virtual void contextMenuEvent(QContextMenuEvent *event);
+
+#if QT_VERSION < 0x050000
+    virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+#else
+    virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+#endif
 
 private slots:
     void joinChannel(const QModelIndex &index);

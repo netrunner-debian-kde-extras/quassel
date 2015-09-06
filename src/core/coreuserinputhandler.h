@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,6 +36,7 @@ public:
     inline CoreNetwork *coreNetwork() const { return qobject_cast<CoreNetwork *>(parent()); }
 
     void handleUserInput(const BufferInfo &bufferInfo, const QString &text);
+    int lastParamOverrun(const QString &cmd, const QList<QByteArray> &params);
 
 public slots:
     void handleAway(const BufferInfo &bufferInfo, const QString &text);
@@ -62,6 +63,7 @@ public slots:
     void handleHalfop(const BufferInfo& bufferInfo, const QString &nicks);
     void handlePart(const BufferInfo &bufferInfo, const QString &text);
     void handlePing(const BufferInfo &bufferInfo, const QString &text);
+    void handlePrint(const BufferInfo &bufferInfo, const QString &text);
     void handleQuery(const BufferInfo &bufferInfo, const QString &text);
     void handleQuit(const BufferInfo &bufferInfo, const QString &text);
     void handleQuote(const BufferInfo &bufferInfo, const QString &text);
@@ -86,8 +88,7 @@ protected:
 private:
     void doMode(const BufferInfo& bufferInfo, const QChar &addOrRemove, const QChar &mode, const QString &nickList);
     void banOrUnban(const BufferInfo &bufferInfo, const QString &text, bool ban);
-    void putPrivmsg(const QByteArray &target, const QByteArray &message, Cipher *cipher = 0);
-    int lastParamOverrun(const QString &cmd, const QList<QByteArray> &params);
+    void putPrivmsg(const QString &target, const QString &message, std::function<QByteArray(const QString &, const QString &)> encodeFunc, Cipher *cipher = 0);
 
 #ifdef HAVE_QCA2
     QByteArray encrypt(const QString &target, const QByteArray &message, bool *didEncrypt = 0) const;

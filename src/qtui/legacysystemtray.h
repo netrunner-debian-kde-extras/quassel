@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This file is free software; you can redistribute it and/or modify     *
@@ -23,12 +23,13 @@
 
 #ifndef QT_NO_SYSTEMTRAYICON
 
-#ifdef HAVE_KDE
+#ifdef HAVE_KDE4
 #  include <KSystemTrayIcon>
 #else
 #  include <QSystemTrayIcon>
 #endif
 
+#include <QIcon>
 #include <QTimer>
 
 #include "systemtray.h"
@@ -44,7 +45,7 @@ public:
 
     virtual bool isVisible() const;
     virtual inline bool isSystemTrayAvailable() const;
-    virtual Icon stateIcon() const; // overriden to care about blinkState
+    virtual QIcon stateIcon() const; // overriden to care about blinkState
 
 public slots:
     virtual void setState(State state);
@@ -69,7 +70,7 @@ private:
     bool _blinkState;
     uint _lastMessageId;
 
-#ifdef HAVE_KDE
+#ifdef HAVE_KDE4
     KSystemTrayIcon *_trayIcon;
 #else
     QSystemTrayIcon *_trayIcon;

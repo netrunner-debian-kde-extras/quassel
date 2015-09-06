@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,13 +20,14 @@
 
 #include "chatmonitorsettingspage.h"
 
+#include <QIcon>
+
 #include "client.h"
 #include "networkmodel.h"
 #include "bufferviewconfig.h"
 #include "buffermodel.h"
 #include "bufferview.h"
 #include "bufferviewfilter.h"
-#include "iconloader.h"
 #include "chatviewsettings.h"
 
 #include <QVariant>
@@ -36,8 +37,8 @@ ChatMonitorSettingsPage::ChatMonitorSettingsPage(QWidget *parent)
 {
     ui.setupUi(this);
 
-    ui.activateBuffer->setIcon(SmallIcon("go-next"));
-    ui.deactivateBuffer->setIcon(SmallIcon("go-previous"));
+    ui.activateBuffer->setIcon(QIcon::fromTheme("go-next"));
+    ui.deactivateBuffer->setIcon(QIcon::fromTheme("go-previous"));
 
     // setup available buffers config (for the bufferview on the left)
     _configAvailable = new BufferViewConfig(-667, this);
@@ -81,7 +82,7 @@ void ChatMonitorSettingsPage::defaults()
     settings["ShowOwnMsgs"] = false;
     settings["Buffers"] = QVariant();
     settings["Default"] = true;
-    settings["ShowBacklog"] = false;
+    settings["ShowBacklog"] = true;
     settings["IncludeRead"] = false;
     load();
     widgetHasChanged();
@@ -133,8 +134,8 @@ void ChatMonitorSettingsPage::loadSettings()
     settings["ShowHighlights"] = chatViewSettings.value("ShowHighlights", false);
     settings["ShowOwnMsgs"] = chatViewSettings.value("ShowOwnMsgs", false);
     settings["Buffers"] = chatViewSettings.value("Buffers", QVariantList());
-    settings["ShowBacklog"] = chatViewSettings.value("ShowBacklog", false);
-    settings["IncludeRead"] = chatViewSettings.value("IncludeRead", false);
+    settings["ShowBacklog"] = chatViewSettings.value("ShowBacklog", true);
+    settings["IncludeRead"] = chatViewSettings.value("IncludeRead", true);
 }
 
 

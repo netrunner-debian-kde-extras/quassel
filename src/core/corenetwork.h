@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -39,6 +39,8 @@
 #endif
 
 #include "coresession.h"
+
+#include <functional>
 
 class CoreIdentity;
 class CoreUserInputHandler;
@@ -93,6 +95,8 @@ public:
     inline quint16 localPort() const { return socket.localPort(); }
     inline quint16 peerPort() const { return socket.peerPort(); }
 
+    QList<QList<QByteArray>> splitMessage(const QString &cmd, const QString &message, std::function<QList<QByteArray>(QString &)> cmdGenerator);
+
 public slots:
     virtual void setMyNick(const QString &mynick);
 
@@ -112,6 +116,7 @@ public slots:
     void userInput(BufferInfo bufferInfo, QString msg);
     void putRawLine(QByteArray input);
     void putCmd(const QString &cmd, const QList<QByteArray> &params, const QByteArray &prefix = QByteArray());
+    void putCmd(const QString &cmd, const QList<QList<QByteArray>> &params, const QByteArray &prefix = QByteArray());
 
     void setChannelJoined(const QString &channel);
     void setChannelParted(const QString &channel);
@@ -157,6 +162,7 @@ signals:
     void sslErrors(const QVariant &errorData);
 
     void newEvent(Event *event);
+    void socketOpen(const CoreIdentity *identity, const QHostAddress &localAddress, quint16 localPort, const QHostAddress &peerAddress, quint16 peerPort);
     void socketInitialized(const CoreIdentity *identity, const QHostAddress &localAddress, quint16 localPort, const QHostAddress &peerAddress, quint16 peerPort);
     void socketDisconnected(const CoreIdentity *identity, const QHostAddress &localAddress, quint16 localPort, const QHostAddress &peerAddress, quint16 peerPort);
 

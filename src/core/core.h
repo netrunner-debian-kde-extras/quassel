@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -73,6 +73,15 @@ public:
     static inline UserId validateUser(const QString &userName, const QString &password) {
         return instance()->_storage->validateUser(userName, password);
     }
+
+
+    //! Change a user's password
+    /**
+     * \param userId     The user's ID
+     * \param password   The user's unencrypted new password
+     * \return true, if the password change was successful
+     */
+    static bool changeUserPassword(UserId userId, const QString &password);
 
     //! Store a user setting persistently
     /**
@@ -524,13 +533,15 @@ private slots:
     void socketError(QAbstractSocket::SocketError err, const QString &errorString);
     void setupClientSession(RemotePeer *, UserId);
 
+    void changeUserPass(const QString &username);
+
 private:
     Core();
     ~Core();
     void init();
     static Core *instanceptr;
 
-    SessionThread *createSession(UserId userId, bool restoreState = false);
+    SessionThread *sessionForUser(UserId userId, bool restoreState = false);
     void addClientHelper(RemotePeer *peer, UserId uid);
     //void processCoreSetup(QTcpSocket *socket, QVariantMap &msg);
     QString setupCoreForInternalUsage();
@@ -541,13 +552,12 @@ private:
     void unregisterStorageBackend(Storage *);
     bool selectBackend(const QString &backend);
     void createUser();
-    void changeUserPass(const QString &username);
     void saveBackendSettings(const QString &backend, const QVariantMap &settings);
     QVariantMap promptForSettings(const Storage *storage);
 
 private:
     QSet<CoreAuthHandler *> _connectingClients;
-    QHash<UserId, SessionThread *> sessions;
+    QHash<UserId, SessionThread *> _sessions;
     Storage *_storage;
     QTimer _storageSyncTimer;
 

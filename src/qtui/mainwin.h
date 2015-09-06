@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,11 +18,12 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef MAINWIN_H_
-#define MAINWIN_H_
+#pragma once
 
-#ifdef HAVE_KDE
+#ifdef HAVE_KDE4
 #  include <KMainWindow>
+#elif defined HAVE_KF5
+#  include <KXmlGui/KMainWindow>
 #else
 #  include <QMainWindow>
 #endif
@@ -36,6 +37,7 @@ class BufferHotListFilter;
 class BufferView;
 class BufferViewConfig;
 class ClientBufferViewConfig;
+class ClientTransfer;
 class CoreAccount;
 class CoreConnectionStatusWidget;
 class BufferViewDock;
@@ -56,10 +58,9 @@ class KHelpMenu;
 //!\brief The main window of Quassel's QtUi.
 class MainWin
 #ifdef HAVE_KDE
-    : public KMainWindow
-{
+    : public KMainWindow {
 #else
-: public QMainWindow {
+    : public QMainWindow {
 #endif
     Q_OBJECT
 
@@ -122,6 +123,8 @@ private slots:
     void showNotificationsDlg();
     void showIgnoreList(QString newRule = QString());
     void showShortcutsDlg();
+    void showPasswordChangeDlg();
+    void showNewTransferDlg(const ClientTransfer *transfer);
     void onFullScreenToggled();
 
     void handleCoreConnectionError(const QString &errorMsg);
@@ -152,9 +155,7 @@ private slots:
 
     void saveMenuBarStatus(bool enabled);
     void saveStatusBarStatus(bool enabled);
-#ifdef Q_WS_MAC
     void saveMainToolBarStatus(bool enabled);
-#endif
 
     void loadLayout();
     void saveLayout();
@@ -203,6 +204,7 @@ private:
     ChatMonitorView *_chatMonitorView;
     TopicWidget *_topicWidget;
 
+    QAction *_fullScreenAction;
     QMenu *_fileMenu, *_networksMenu, *_viewMenu, *_bufferViewsMenu, *_settingsMenu, *_helpMenu, *_helpDebugMenu;
     QMenu *_toolbarMenu;
     QToolBar *_mainToolBar, *_chatViewToolBar, *_nickToolBar;
@@ -220,6 +222,3 @@ private:
 
     friend class QtUi;
 };
-
-
-#endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,7 +21,7 @@
 #ifndef NETWORKSSETTINGSPAGE_H
 #define NETWORKSSETTINGSPAGE_H
 
-#include <QPixmap>
+#include <QIcon>
 
 #include "network.h"
 #include "settingspage.h"
@@ -95,7 +95,7 @@ private:
     CertIdentity *_cid;
 #endif
 
-    QPixmap connectedIcon, connectingIcon, disconnectedIcon;
+    QIcon connectedIcon, connectingIcon, disconnectedIcon;
 
     void reset();
     bool testHasChanged();

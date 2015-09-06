@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,6 +32,9 @@ CoreBasicHandler::CoreBasicHandler(CoreNetwork *parent)
 
     connect(this, SIGNAL(putCmd(QString, const QList<QByteArray> &, const QByteArray &)),
         network(), SLOT(putCmd(QString, const QList<QByteArray> &, const QByteArray &)));
+
+    connect(this, SIGNAL(putCmd(QString, const QList<QList<QByteArray>> &, const QByteArray &)),
+        network(), SLOT(putCmd(QString, const QList<QList<QByteArray>> &, const QByteArray &)));
 
     connect(this, SIGNAL(putRawLine(const QByteArray &)),
         network(), SLOT(putRawLine(const QByteArray &)));

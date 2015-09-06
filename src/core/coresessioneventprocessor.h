@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -63,7 +63,7 @@ public:
     Q_INVOKABLE void processKeyEvent(KeyEvent *event);
 #endif
 
-    Q_INVOKABLE void processIrcEvent001(IrcEvent *event);          // RPL_WELCOME
+    Q_INVOKABLE void processIrcEvent001(IrcEventNumeric *event);   // RPL_WELCOME
     Q_INVOKABLE void processIrcEvent005(IrcEvent *event);          // RPL_ISUPPORT
     Q_INVOKABLE void processIrcEvent221(IrcEvent *event);          // RPL_UMODEIS
     Q_INVOKABLE void processIrcEvent250(IrcEvent *event);          // RPL_STATSCONN
@@ -97,6 +97,7 @@ public:
 
     Q_INVOKABLE void handleCtcpAction(CtcpEvent *event);
     Q_INVOKABLE void handleCtcpClientinfo(CtcpEvent *event);
+    Q_INVOKABLE void handleCtcpDcc(CtcpEvent *event);
     Q_INVOKABLE void handleCtcpPing(CtcpEvent *event);
     Q_INVOKABLE void handleCtcpTime(CtcpEvent *event);
     Q_INVOKABLE void handleCtcpVersion(CtcpEvent *event);

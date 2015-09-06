@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,12 +34,12 @@
 
 // migration related
 #include <QFile>
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #  include <windows.h>
 #else
 #  include <unistd.h>
 #  include <termios.h>
-#endif /* Q_OS_WIN32 */
+#endif /* Q_OS_WIN */
 
 #ifdef HAVE_UMASK
 #  include <sys/types.h>
@@ -94,11 +94,11 @@ Core::Core()
 
     // FIXME: MIGRATION 0.3 -> 0.4: Move database and core config to new location
     // Move settings, note this does not delete the old files
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     QSettings newSettings("quassel-irc.org", "quasselcore");
 #else
 
-# ifdef Q_WS_WIN
+# ifdef Q_OS_WIN
     QSettings::Format format = QSettings::IniFormat;
 # else
     QSettings::Format format = QSettings::NativeFormat;
@@ -106,10 +106,10 @@ Core::Core()
     QString newFilePath = Quassel::configDirPath() + "quasselcore"
                           + ((format == QSettings::NativeFormat) ? QLatin1String(".conf") : QLatin1String(".ini"));
     QSettings newSettings(newFilePath, format);
-#endif /* Q_WS_MAC */
+#endif /* Q_OS_MAC */
 
     if (newSettings.value("Config/Version").toUInt() == 0) {
-#   ifdef Q_WS_MAC
+#   ifdef Q_OS_MAC
         QString org = "quassel-irc.org";
 #   else
         QString org = "Quassel Project";
@@ -122,10 +122,10 @@ Core::Core()
             newSettings.setValue("Config/Version", 1);
             qWarning() << "*   Your core settings have been migrated to" << newSettings.fileName();
 
-#ifndef Q_WS_MAC /* we don't need to move the db and cert for mac */
-#ifdef Q_OS_WIN32
+#ifndef Q_OS_MAC /* we don't need to move the db and cert for mac */
+#ifdef Q_OS_WIN
             QString quasselDir = qgetenv("APPDATA") + "/quassel/";
-#elif defined Q_WS_MAC
+#elif defined Q_OS_MAC
             QString quasselDir = QDir::homePath() + "/Library/Application Support/Quassel/";
 #else
             QString quasselDir = QDir::homePath() + "/.quassel/";
@@ -153,7 +153,7 @@ Core::Core()
                 else
                     qWarning() << "!!! Moving your certificate has failed. Please move it manually into" << Quassel::configDirPath();
             }
-#endif /* !Q_WS_MAC */
+#endif /* !Q_OS_MAC */
             qWarning() << "*** Migration completed.\n\n";
         }
     }
@@ -222,7 +222,7 @@ Core::~Core()
     foreach(CoreAuthHandler *handler, _connectingClients) {
         handler->deleteLater(); // disconnect non authed clients
     }
-    qDeleteAll(sessions);
+    qDeleteAll(_sessions);
     qDeleteAll(_storageBackends);
 }
 
@@ -234,7 +234,8 @@ void Core::saveState()
     CoreSettings s;
     QVariantMap state;
     QVariantList activeSessions;
-    foreach(UserId user, instance()->sessions.keys()) activeSessions << QVariant::fromValue<UserId>(user);
+    foreach(UserId user, instance()->_sessions.keys())
+        activeSessions << QVariant::fromValue<UserId>(user);
     state["CoreStateVersion"] = 1;
     state["ActiveSessions"] = activeSessions;
     s.setCoreState(state);
@@ -247,7 +248,7 @@ void Core::restoreState()
         // qWarning() << qPrintable(tr("Cannot restore a state for an unconfigured core!"));
         return;
     }
-    if (instance()->sessions.count()) {
+    if (instance()->_sessions.count()) {
         qWarning() << qPrintable(tr("Calling restoreState() even though active sessions exist!"));
         return;
     }
@@ -265,7 +266,7 @@ void Core::restoreState()
         quInfo() << "Restoring previous core state...";
         foreach(QVariant v, activeSessions) {
             UserId user = v.value<UserId>();
-            instance()->createSession(user, true);
+            instance()->sessionForUser(user, true);
         }
     }
 }
@@ -380,13 +381,10 @@ bool Core::initStorage(const QString &backend, const QVariantMap &settings, bool
             return false;  // trigger setup process
         if (storage->setup(settings))
             return initStorage(backend, settings, false);
-    // if setup wasn't successfull we mark the backend as unavailable
+    // if initialization wasn't successful, we quit to keep from coming up unconfigured
     case Storage::NotAvailable:
-        qCritical() << "Selected storage backend is not available:" << backend;
-        storage->deleteLater();
-        _storageBackends.remove(backend);
-        storage = 0;
-        return false;
+        qCritical() << "FATAL: Selected storage backend is not available:" << backend;
+        exit(EXIT_FAILURE);
     case Storage::IsReady:
         // delete all other backends
         _storageBackends.remove(backend);
@@ -580,19 +578,7 @@ void Core::setupClientSession(RemotePeer *peer, UserId uid)
     handler->deleteLater();
 
     // Find or create session for validated user
-    SessionThread *session;
-    if (sessions.contains(uid)) {
-        session = sessions[uid];
-    }
-    else {
-        session = createSession(uid);
-        if (!session) {
-            qWarning() << qPrintable(tr("Could not initialize session for client:")) << qPrintable(peer->description());
-            peer->close();
-            peer->deleteLater();
-            return;
-        }
-    }
+    sessionForUser(uid);
 
     // as we are currently handling an event triggered by incoming data on this socket
     // it is unsafe to directly move the socket to the client thread.
@@ -613,14 +599,7 @@ void Core::customEvent(QEvent *event)
 void Core::addClientHelper(RemotePeer *peer, UserId uid)
 {
     // Find or create session for validated user
-    if (!sessions.contains(uid)) {
-        qWarning() << qPrintable(tr("Could not find a session for client:")) << qPrintable(peer->description());
-        peer->close();
-        peer->deleteLater();
-        return;
-    }
-
-    SessionThread *session = sessions[uid];
+    SessionThread *session = sessionForUser(uid);
     session->addClient(peer);
 }
 
@@ -646,26 +625,20 @@ void Core::setupInternalClientSession(InternalPeer *clientPeer)
     clientPeer->setPeer(corePeer);
 
     // Find or create session for validated user
-    SessionThread *sessionThread;
-    if (sessions.contains(uid))
-        sessionThread = sessions[uid];
-    else
-        sessionThread = createSession(uid);
-
+    SessionThread *sessionThread = sessionForUser(uid);
     sessionThread->addClient(corePeer);
 }
 
 
-SessionThread *Core::createSession(UserId uid, bool restore)
+SessionThread *Core::sessionForUser(UserId uid, bool restore)
 {
-    if (sessions.contains(uid)) {
-        qWarning() << "Calling createSession() when a session for the user already exists!";
-        return 0;
-    }
-    SessionThread *sess = new SessionThread(uid, restore, this);
-    sessions[uid] = sess;
-    sess->start();
-    return sess;
+    if (_sessions.contains(uid))
+        return _sessions[uid];
+
+    SessionThread *session = new SessionThread(uid, restore, this);
+    _sessions[uid] = session;
+    session->start();
+    return session;
 }
 
 
@@ -845,6 +818,15 @@ void Core::changeUserPass(const QString &username)
 }
 
 
+bool Core::changeUserPassword(UserId userId, const QString &password)
+{
+    if (!isConfigured() || !userId.isValid())
+        return false;
+
+    return instance()->_storage->updateUser(userId, password);
+}
+
+
 AbstractSqlMigrationReader *Core::getMigrationReader(Storage *storage)
 {
     if (!storage)
@@ -935,7 +917,7 @@ QVariantMap Core::promptForSettings(const Storage *storage)
 }
 
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 void Core::stdInEcho(bool on)
 {
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
@@ -962,4 +944,4 @@ void Core::stdInEcho(bool on)
 }
 
 
-#endif /* Q_OS_WIN32 */
+#endif /* Q_OS_WIN */

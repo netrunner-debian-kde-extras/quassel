@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -45,7 +45,6 @@ public:
 
     void setSignalProxy(SignalProxy *proxy);
 
-    virtual Protocol::Type protocol() const = 0;
     virtual QString protocolName() const = 0;
     virtual QString description() const;
     virtual quint16 enabledFeatures() const { return 0; }

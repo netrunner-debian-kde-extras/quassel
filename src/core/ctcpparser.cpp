@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,6 +24,7 @@
 #include "coresession.h"
 #include "ctcpevent.h"
 #include "messageevent.h"
+#include "coreuserinputhandler.h"
 
 const QByteArray XDELIM = "\001";
 
@@ -311,9 +312,13 @@ QByteArray CtcpParser::pack(const QByteArray &ctcpTag, const QByteArray &message
 
 void CtcpParser::query(CoreNetwork *net, const QString &bufname, const QString &ctcpTag, const QString &message)
 {
-    QList<QByteArray> params;
-    params << net->serverEncode(bufname) << lowLevelQuote(pack(net->serverEncode(ctcpTag), net->userEncode(bufname, message)));
-    net->putCmd("PRIVMSG", params);
+    QString cmd("PRIVMSG");
+
+    std::function<QList<QByteArray>(QString &)> cmdGenerator = [&] (QString &splitMsg) -> QList<QByteArray> {
+        return QList<QByteArray>() << net->serverEncode(bufname) << lowLevelQuote(pack(net->serverEncode(ctcpTag), net->userEncode(bufname, splitMsg)));
+    };
+
+    net->putCmd(cmd, net->splitMessage(cmd, message, cmdGenerator));
 }
 
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -112,11 +112,9 @@ public :
         MessageEvent                = 0x00040000, ///< Stringified event suitable for converting to Message
 
         CtcpEvent                   = 0x00050000,
-        CtcpEventFlush
+        CtcpEventFlush,
 
-#ifdef HAVE_QCA2
-        ,KeyEvent                    = 0x00060000
-#endif
+        KeyEvent                    = 0x00060000
     };
 
     EventManager(QObject *parent = 0);

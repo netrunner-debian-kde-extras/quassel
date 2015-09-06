@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -213,10 +213,6 @@ public :
     inline bool autoAwayActive() const { return _autoAwayActive; }
     inline void setAutoAwayActive(bool active) { _autoAwayActive = active; }
 
-    static QStringList presetNetworks(bool onlyDefault = false);
-    static QStringList presetDefaultChannels(const QString &networkName);
-    static NetworkInfo networkInfoFromPreset(const QString &networkName);
-
 public slots:
     void setNetworkName(const QString &networkName);
     void setCurrentServer(const QString &currentServer);
@@ -371,8 +367,6 @@ private:
     static QTextCodec *_defaultCodecForDecoding;
 
     bool _autoAwayActive; // when this is active handle305 and handle306 don't trigger any output
-
-    static QString _networksIniPath;
 
     friend class IrcUser;
     friend class IrcChannel;

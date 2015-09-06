@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,8 +20,9 @@
 
 #include "topicwidget.h"
 
+#include <QIcon>
+
 #include "client.h"
-#include "iconloader.h"
 #include "networkmodel.h"
 #include "uisettings.h"
 #include "graphicalui.h"
@@ -31,7 +32,7 @@ TopicWidget::TopicWidget(QWidget *parent)
     : AbstractItemView(parent)
 {
     ui.setupUi(this);
-    ui.topicEditButton->setIcon(SmallIcon("edit-rename"));
+    ui.topicEditButton->setIcon(QIcon::fromTheme("edit-rename"));
     ui.topicLineEdit->setLineWrapEnabled(true);
     ui.topicLineEdit->installEventFilter(this);
 
@@ -114,11 +115,19 @@ void TopicWidget::setTopic(const QModelIndex &index)
         switch (Client::networkModel()->bufferType(id)) {
         case BufferInfo::StatusBuffer:
             if (network) {
+#if QT_VERSION < 0x050000
                 newtopic = QString("%1 (%2) | %3 | %4")
                            .arg(Qt::escape(network->networkName()))
                            .arg(Qt::escape(network->currentServer()))
                            .arg(tr("Users: %1").arg(network->ircUsers().count()))
                            .arg(tr("Lag: %1 msecs").arg(network->latency()));
+#else
+                newtopic = QString("%1 (%2) | %3 | %4")
+                           .arg(network->networkName().toHtmlEscaped())
+                           .arg(network->currentServer().toHtmlEscaped())
+                           .arg(tr("Users: %1").arg(network->ircUsers().count()))
+                           .arg(tr("Lag: %1 msecs").arg(network->latency()));
+#endif
             }
             else {
                 newtopic = index0.data(Qt::DisplayRole).toString();

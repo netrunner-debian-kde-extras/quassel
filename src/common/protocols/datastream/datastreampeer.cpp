@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,12 +19,11 @@
  ***************************************************************************/
 
 #include <QtEndian>
-
+#include <QDataStream>
 #include <QHostAddress>
 #include <QTcpSocket>
 
 #include "datastreampeer.h"
-#include "quassel.h"
 
 using namespace Protocol;
 
@@ -117,7 +116,7 @@ void DataStreamPeer::handleHandshakeMessage(const QVariantList &mapData)
     }
 
     if (msgType == "ClientInit") {
-        handle(RegisterClient(m["ClientVersion"].toString(), false)); // UseSsl obsolete
+        handle(RegisterClient(m["ClientVersion"].toString(), m["ClientDate"].toString(), false)); // UseSsl obsolete
     }
 
     else if (msgType == "ClientInitReject") {
@@ -125,7 +124,7 @@ void DataStreamPeer::handleHandshakeMessage(const QVariantList &mapData)
     }
 
     else if (msgType == "ClientInitAck") {
-        handle(ClientRegistered(m["CoreFeatures"].toUInt(), m["Configured"].toBool(), m["StorageBackends"].toList(), false, QDateTime())); // SupportsSsl and coreStartTime obsolete
+        handle(ClientRegistered(m["CoreFeatures"].toUInt(), m["Configured"].toBool(), m["StorageBackends"].toList(), false, QString())); // SupportsSsl and coreInfo obsolete
     }
 
     else if (msgType == "CoreSetupData") {
@@ -168,7 +167,7 @@ void DataStreamPeer::dispatch(const RegisterClient &msg) {
     QVariantMap m;
     m["MsgType"] = "ClientInit";
     m["ClientVersion"] = msg.clientVersion;
-    m["ClientDate"] = Quassel::buildInfo().buildDate;
+    m["ClientDate"] = msg.buildDate;
 
     writeMessage(m);
 }

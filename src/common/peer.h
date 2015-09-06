@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2014 by the Quassel Project                        *
+ *   Copyright (C) 2005-2015 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,6 +35,7 @@ class Peer : public QObject
 public:
     Peer(AuthHandler *authHandler, QObject *parent = 0);
 
+    virtual Protocol::Type protocol() const = 0;
     virtual QString description() const = 0;
 
     virtual SignalProxy *signalProxy() const = 0;
@@ -81,6 +82,13 @@ protected:
 private:
     QPointer<AuthHandler> _authHandler;
 };
+
+// We need to special-case Peer* in attached signals/slots, so typedef it for the meta type system
+typedef Peer * PeerPtr;
+Q_DECLARE_METATYPE(PeerPtr)
+
+QDataStream &operator<<(QDataStream &out, PeerPtr ptr);
+QDataStream &operator>>(QDataStream &in, PeerPtr &ptr);
 
 
 // Template method needed in the header
