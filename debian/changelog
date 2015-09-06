@@ -20,6 +20,7 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
     condition. (Closes: #753737)
   * Stop hardcoding the path to deluser / delgroup in postrm.
   * Enable all hardening build flags.
+  * Build with -Wl,--as-needed.
 
   [ Scott Kitterman ]
   * Add systemd service file and associated changes for quasselcore.
