@@ -1,2 +1,7 @@
-debian/tmp/usr/share/icons/hicolor/
-debian/tmp/usr/share/pixmaps/
+usr/share/icons/hicolor/
+usr/share/pixmaps/
+usr/share/quassel/translations/*.qm
+usr/share/quassel/networks.ini
+usr/share/quassel/scripts/
+usr/share/quassel/stylesheets/*.qss
+usr/share/knotifications5/quassel.notifyrc
