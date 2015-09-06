@@ -1,15 +1,17 @@
 quassel (1:0.12.2-1) UNRELEASED; urgency=medium
 
   [ Felix Geyer ]
-  * New upstream release.
+  * New upstream release. (Closes: #779726)
   * Remove patches that have been applied upstream:
     - CVE-2014-8483.patch
     - CVE-2015-2778.patch
     - CVE-2015-3427.patch
   * Set maintainer to Debian KDE Extras Team.
   * Add Vcs control fields pointing to the new git packaging repo.
+    (Closes: #732605)
   * Drop explicit phonon depenencies, they are automatically added.
   * Build quassel against Qt5 + KF5 libs instead of a Qt4 and a KDE4 variant.
+    (Closes: #784519)
     - Remove quassel-data-kde4.
     - Turn quassel-kde4 and quassel-client-kde4 into transitional packages.
   * Enable parallel building.
