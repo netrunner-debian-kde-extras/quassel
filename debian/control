@@ -5,7 +5,7 @@ Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>
 Uploaders: Thomas Mueller <thomas.mueller@tmit.eu>,
            Felix Geyer <fgeyer@debian.org>,
            Scott Kitterman <scott@kitterman.com>
-Build-Depends: debhelper (>= 9.20120417),
+Build-Depends: debhelper (>= 9.20130504~),
                cmake,
                dh-systemd,
                libqca-qt5-2-dev,

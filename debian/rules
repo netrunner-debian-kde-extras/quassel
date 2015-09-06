@@ -8,7 +8,6 @@ override_dh_auto_configure:
 
 override_dh_install:
 	dh_install --fail-missing
-	install -o root -g root -m 644 debian/quassel-core.quasselcore.systemd debian/quassel-core/lib/systemd/system/quasselcore.service
 
 override_dh_installinit:
 	dh_installinit -r --error-handler=exit --name=quasselcore
