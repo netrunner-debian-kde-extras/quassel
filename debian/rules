@@ -22,11 +22,6 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	dh_auto_install --builddirectory=$(BUILDDIR_KDE) --destdir=debian/kde4-tmp
-	rm -r debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/AUTHORS
-	rm -r debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/CONTRIBUTING
-	rm -r debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/COPYING
-	rm -rf debian/kde4-tmp/usr/share/kde4/apps/quassel/icons/oxygen/scalable/
-	
 	dh_auto_install
 
 override_dh_installinit:
