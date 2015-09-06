@@ -24,7 +24,7 @@ Description: distributed IRC client - core component
 
 Package: quassel-client
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, quassel-data (= ${source:Version}), dbus-x11, phonon, gawk
+Depends: ${shlibs:Depends}, ${misc:Depends}, quassel-data (= ${source:Version}), dbus-x11, gawk
 Conflicts: quassel (<< 0.3.1-1), quassel-client-kde4
 Replaces: quassel (<< 0.3.1-1)
 Description: distributed IRC client - Qt-based client component
@@ -37,7 +37,7 @@ Description: distributed IRC client - Qt-based client component
 
 Package: quassel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt4-sql-sqlite, quassel-data (=${source:Version}), dbus-x11, phonon, gawk
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt4-sql-sqlite, quassel-data (=${source:Version}), dbus-x11, gawk
 Conflicts: quassel-kde4
 Description: distributed IRC client - Qt-based monolithic core+client
  Quassel is a modern, cross-platform, distributed IRC client, meaning that
