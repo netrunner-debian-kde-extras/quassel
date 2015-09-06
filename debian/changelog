@@ -16,6 +16,8 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
     - Turn quassel-kde4 and quassel-client-kde4 into transitional packages.
   * Enable parallel building.
   * Pass --fail-missing to dh_install.
+  * Create the SSL certificate as user quasselcore to avoid a symlink race
+    condition. (Closes: #753737)
 
   [ Scott Kitterman ]
   * Add systemd service file and associated changes for quasselcore.

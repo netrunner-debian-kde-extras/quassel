@@ -40,9 +40,8 @@ fi
 # FIXME: Not over-writing existing certs, but need to (someday) replace old certs
 if [ ! -e $QUASSEL_CERT ] ; then
   echo "Generating SSL certificate as $QUASSEL_CERT ..."
-  openssl req -x509 -nodes -batch -days 680 -newkey rsa -keyout \
-  $QUASSEL_CERT -out $QUASSEL_CERT
-  chown $QUASSEL_USER:$QUASSEL_GROUP $QUASSEL_CERT
+  su $QUASSEL_USER -s /bin/sh -c "openssl req -x509 -nodes -batch -days 680 -newkey rsa \
+    -keyout $QUASSEL_CERT -out $QUASSEL_CERT"
 fi
 
 chmod 0440 $QUASSEL_CERT
