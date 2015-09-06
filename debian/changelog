@@ -19,6 +19,7 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
   * Create the SSL certificate as user quasselcore to avoid a symlink race
     condition. (Closes: #753737)
   * Stop hardcoding the path to deluser / delgroup in postrm.
+  * Enable all hardening build flags.
 
   [ Scott Kitterman ]
   * Add systemd service file and associated changes for quasselcore.
