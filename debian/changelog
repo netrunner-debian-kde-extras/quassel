@@ -11,6 +11,7 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
   * Build quassel against Qt5 + KF5 libs instead of a Qt4 and a KDE4 variant.
     - Remove quassel-data-kde4.
     - Turn quassel-kde4 and quassel-client-kde4 into transitional packages.
+  * Enable parallel building.
 
  -- Felix Geyer <fgeyer@debian.org>  Thu, 03 Sep 2015 18:39:11 +0200
 
