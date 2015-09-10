@@ -1,4 +1,4 @@
-quassel (1:0.12.2-1) UNRELEASED; urgency=medium
+quassel (1:0.12.2-1) unstable; urgency=medium
 
   [ Felix Geyer ]
   * New upstream release. (Closes: #779726)
@@ -30,7 +30,7 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
   [ Scott Kitterman ]
   * Add systemd service file and associated changes for quasselcore.
 
- -- Felix Geyer <fgeyer@debian.org>  Sun, 06 Sep 2015 11:34:35 -0400
+ -- Felix Geyer <fgeyer@debian.org>  Thu, 10 Sep 2015 22:44:32 +0200
 
 quassel (1:0.10.0-2.4) unstable; urgency=high
 
