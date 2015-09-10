@@ -1,0 +1,15 @@
+Description: Work around missing icon theme fallback in KF5.
+ Only oxygen and breeze ship the icons quassel uses.
+Author: Felix Geyer <fgeyer@debian.org>
+
+--- a/src/qtui/qtuiapplication.cpp
++++ b/src/qtui/qtuiapplication.cpp
+@@ -145,7 +145,7 @@ bool QtUiApplication::init()
+         // Set the icon theme
+         if (Quassel::isOptionSet("icontheme"))
+             QIcon::setThemeName(Quassel::optionValue("icontheme"));
+-        else if (QIcon::themeName().isEmpty())
++        else if (QIcon::themeName() != "oxygen" && QIcon::themeName() != "breeze")
+             // Some platforms don't set a default icon theme; chances are we can find our bundled Oxygen theme though
+             QIcon::setThemeName("oxygen");
+ 

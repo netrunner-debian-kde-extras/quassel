@@ -23,6 +23,9 @@ quassel (1:0.12.2-1) UNRELEASED; urgency=medium
   * Build with -Wl,--as-needed.
   * Fix detection of OpenSSL when building against Qt5.
     - Add 02_set-required-libs-and-flags.patch from openSUSE.
+  * Work around missing icon theme fallback in KF5.
+    - Add 03_force_icon_theme.patch
+    - Add oxygen-icon-theme to quassel-data/Recommends.
 
   [ Scott Kitterman ]
   * Add systemd service file and associated changes for quasselcore.

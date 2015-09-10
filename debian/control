@@ -72,6 +72,7 @@ Description: distributed IRC client - monolithic core+client
 Package: quassel-data
 Architecture: all
 Depends: ${misc:Depends}
+Recommends: oxygen-icon-theme
 Conflicts: quassel-data-kde4
 Description: distributed IRC client - shared data
  Quassel is a modern, cross-platform, distributed IRC client, meaning that
