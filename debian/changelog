@@ -1,3 +1,10 @@
+quassel (1:0.12.2-3) unstable; urgency=high
+
+  * Fix CVE-2015-8547: op command denial of service issue (Closes: #807801)
+    - Add CVE-2015-8547.patch
+
+ -- Felix Geyer <fgeyer@debian.org>  Mon, 14 Dec 2015 21:25:33 +0100
+
 quassel (1:0.12.2-2) unstable; urgency=medium
 
   * Fix FTBFS with Qt 5.5. (Closes: #802868)
