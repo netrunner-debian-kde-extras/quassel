@@ -105,7 +105,7 @@ void AbstractTreeItem::removeAllChilds()
         child = *childIter;
         child->setTreeItemFlags(0); // disable self deletion, as this would only fuck up consitency and the child gets deleted anyways
         child->removeAllChilds();
-        childIter++;
+        ++childIter;
     }
 
     emit beginRemoveChilds(0, numChilds - 1);
@@ -220,7 +220,7 @@ void AbstractTreeItem::dumpChildList()
         while (childIter != _childItems.constEnd()) {
             child = *childIter;
             qDebug() << "Row:" << child->row() << child << child->data(0, Qt::DisplayRole);
-            childIter++;
+            ++childIter;
         }
     }
     qDebug() << "==== End Of Childlist ====";
@@ -556,10 +556,9 @@ void TreeModel::endAppendChilds()
     ChildStatus cs = _childStatus;
 #ifndef QT_NO_DEBUG
     QModelIndex parent = indexByItem(parentItem);
-#endif
     Q_ASSERT(cs.parent == parent);
     Q_ASSERT(rowCount(parent) == cs.childCount + cs.end - cs.start + 1);
-
+#endif
     _aboutToRemoveOrInsert = false;
     for (int i = cs.start; i <= cs.end; i++) {
         connectItem(parentItem->child(i));
@@ -605,9 +604,9 @@ void TreeModel::endRemoveChilds()
 #ifndef QT_NO_DEBUG
     ChildStatus cs = _childStatus;
     QModelIndex parent = indexByItem(parentItem);
-#endif
     Q_ASSERT(cs.parent == parent);
     Q_ASSERT(rowCount(parent) == cs.childCount - cs.end + cs.start - 1);
+#endif
     _aboutToRemoveOrInsert = false;
 
     endRemoveRows();

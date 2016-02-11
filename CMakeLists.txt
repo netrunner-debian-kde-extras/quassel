@@ -11,8 +11,8 @@ project(QuasselIRC)
 # Versions
 set(QUASSEL_MAJOR  0)
 set(QUASSEL_MINOR 12)
-set(QUASSEL_PATCH  2)
-set(QUASSEL_VERSION_STRING "0.12.2")
+set(QUASSEL_PATCH  3)
+set(QUASSEL_VERSION_STRING "0.12.3")
 
 # We want to know CMake's version for debug reasons
 message(STATUS "Using CMake ${CMAKE_VERSION}")
@@ -217,12 +217,21 @@ if (USE_QT5)
             PURPOSE     "Required for audio notifications"
         )
 
-        find_package(LibsnoreQt5 QUIET)
+        find_package(LibsnoreQt5 0.7.0 QUIET)
         set_package_properties(LibsnoreQt5 PROPERTIES TYPE OPTIONAL
-            URL "https://github.com/TheOneRing/Snorenotify"
+            URL "https://projects.kde.org/projects/playground/libs/snorenotify"
             DESCRIPTION "a cross-platform notification framework"
             PURPOSE     "Enable support for the snorenotify framework"
         )
+        if(LibsnoreQt5_FOUND)
+            find_package(LibsnoreSettingsQt5)
+            set_package_properties(LibsnoreSettingsQt5 PROPERTIES TYPE REQUIRED
+                URL "https://projects.kde.org/projects/playground/libs/snorenotify"
+                DESCRIPTION "a cross-platform notification framework"
+                PURPOSE     "Enable support for the snorenotify framework"
+            )
+        endif()
+        
 
         if (WITH_WEBKIT)
             find_package(Qt5WebKit QUIET)
@@ -240,7 +249,11 @@ if (USE_QT5)
                 )
             endif()
         endif()
-        add_feature_info("WITH_WEBKIT, QtWebKit and QtWebKitWidgets modules" Qt5WebKitWidgets_FOUND "Support showing previews for URLs in chat")
+
+        if (WITH_WEBKIT AND Qt5WebKitWidgets_FOUND)
+            set(HAVE_WEBKIT true)
+        endif()
+        add_feature_info("WITH_WEBKIT, QtWebKit and QtWebKitWidgets modules" HAVE_WEBKIT "Support showing previews for URLs in chat")
 
         # KDE Frameworks
         ################
@@ -357,13 +370,6 @@ else(USE_QT5)
                 DESCRIPTION "a multimedia abstraction library"
                 PURPOSE     "Required for audio notifications"
             )
-
-            find_package(Libsnore QUIET)
-            set_package_properties(Libsnore PROPERTIES TYPE OPTIONAL
-                URL "https://github.com/TheOneRing/Snorenotify"
-                DESCRIPTION "a cross-platform notification framework"
-                PURPOSE     "Enable support for the snorenotify framework"
-            )
         endif(WITH_KDE)
 
         find_package(IndicateQt QUIET)
@@ -416,6 +422,20 @@ if (NOT WIN32)
     )
 endif()
 
+# Check for SSL support in Qt
+# As there's no easy way to get Qt's configuration in particular for Qt5, let's just compile
+# a small test program checking the defines. This works for both Qt4 and Qt5.
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_INCLUDES ${QT_INCLUDES} ${Qt5Core_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+check_cxx_source_compiles("
+    #include \"qglobal.h\"
+    #if defined QT_NO_SSL
+    #  error \"No SSL support\"
+    #endif
+    int main() {}"
+    HAVE_SSL)
+cmake_pop_check_state()
 
 # Additional compile settings
 #####################################################################
@@ -478,20 +498,6 @@ if (NOT ZLIB_FOUND)
         message(STATUS "WARNING: This may be slow on 32 bit systems!")
     endif()
 endif()
-
-# Check for SSL support in Qt
-# As there's no easy way to get Qt's configuration in particular for Qt5, let's just compile
-# a small test program checking the defines. This works for both Qt4 and Qt5.
-cmake_push_check_state(RESET)
-set(CMAKE_REQUIRED_INCLUDES ${QT_INCLUDES} ${Qt5Core_INCLUDE_DIRS})
-check_cxx_source_compiles("
-    #include \"qglobal.h\"
-    #if defined QT_NO_OPENSSL || defined QT_NO_SSL
-    #  error \"No SSL support\"
-    #endif
-    int main() {}"
-    HAVE_SSL)
-cmake_pop_check_state()
 
 if (HAVE_SSL)
     add_definitions(-DHAVE_SSL)
@@ -570,10 +576,10 @@ git_describe(GIT_DESCRIBE --long)
 # enviroment
 if (NOT GIT_HEAD OR NOT GIT_DESCRIBE)
   if (DEFINED ENV{GIT_HEAD})
-      set(GIT_HEAD ${GIT_HEAD})
+      set(GIT_HEAD $ENV{GIT_HEAD})
   endif ()
   if (DEFINED ENV{GIT_DESCRIBE})
-     set(GIT_DESCRIBE ${GIT_DESCRIBE})
+     set(GIT_DESCRIBE $ENV{GIT_DESCRIBE})
   endif()
 endif()
 

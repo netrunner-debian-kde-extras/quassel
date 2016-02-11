@@ -944,7 +944,7 @@ void PostgreSqlStorage::setChannelPersistent(UserId user, const NetworkId &netwo
     QSqlQuery query(logDb());
     query.prepare(queryString("update_buffer_persistent_channel"));
     query.bindValue(":userid", user.toInt());
-    query.bindValue(":networkId", networkId.toInt());
+    query.bindValue(":networkid", networkId.toInt());
     query.bindValue(":buffercname", channel.toLower());
     query.bindValue(":joined", isJoined);
     safeExec(query);
@@ -957,7 +957,7 @@ void PostgreSqlStorage::setPersistentChannelKey(UserId user, const NetworkId &ne
     QSqlQuery query(logDb());
     query.prepare(queryString("update_buffer_set_channel_key"));
     query.bindValue(":userid", user.toInt());
-    query.bindValue(":networkId", networkId.toInt());
+    query.bindValue(":networkid", networkId.toInt());
     query.bindValue(":buffercname", channel.toLower());
     query.bindValue(":key", key);
     safeExec(query);
@@ -1381,8 +1381,7 @@ bool PostgreSqlStorage::logMessage(Message &msg)
 
         if (addSenderQuery.lastError().isValid()) {
             rollbackSavePoint("sender_sp1", db);
-            getSenderIdQuery.prepare(getSenderIdQuery.lastQuery());
-            safeExec(getSenderIdQuery);
+            getSenderIdQuery = executePreparedQuery("select_senderid", msg.sender(), db);
             watchQuery(getSenderIdQuery);
             getSenderIdQuery.first();
             senderId = getSenderIdQuery.value(0).toInt();
@@ -1452,8 +1451,7 @@ bool PostgreSqlStorage::logMessages(MessageList &msgs)
             if (addSenderQuery.lastError().isValid()) {
                 // seems it was inserted meanwhile... by a different thread
                 rollbackSavePoint("sender_sp", db);
-                selectSenderQuery.prepare(selectSenderQuery.lastQuery());
-                safeExec(selectSenderQuery);
+                selectSenderQuery = executePreparedQuery("select_senderid", sender, db);
                 watchQuery(selectSenderQuery);
                 selectSenderQuery.first();
                 senderIdList << selectSenderQuery.value(0).toInt();
@@ -1843,6 +1841,7 @@ bool PostgreSqlMigrationWriter::writeMo(const QuasselUserMO &user)
     bindValue(0, user.id.toInt());
     bindValue(1, user.username);
     bindValue(2, user.password);
+    bindValue(3, user.hashversion);
     return exec();
 }
 
@@ -2006,7 +2005,7 @@ bool PostgreSqlMigrationWriter::postProcess()
               << Sequence("quasseluser", "userid")
               << Sequence("sender", "senderid");
     QList<Sequence>::const_iterator iter;
-    for (iter = sequences.constBegin(); iter != sequences.constEnd(); iter++) {
+    for (iter = sequences.constBegin(); iter != sequences.constEnd(); ++iter) {
         resetQuery();
         newQuery(QString("SELECT setval('%1_%2_seq', max(%2)) FROM %1").arg(iter->table, iter->field), db);
         if (!exec())
