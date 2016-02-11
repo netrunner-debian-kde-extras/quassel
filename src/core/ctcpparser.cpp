@@ -81,7 +81,7 @@ QByteArray CtcpParser::lowLevelQuote(const QByteArray &message)
     QHash<QByteArray, QByteArray>::const_iterator quoteIter = quoteHash.constBegin();
     while (quoteIter != quoteHash.constEnd()) {
         quotedMessage.replace(quoteIter.value(), quoteIter.key());
-        quoteIter++;
+        ++quoteIter;
     }
     return quotedMessage;
 }
@@ -117,7 +117,7 @@ QByteArray CtcpParser::xdelimQuote(const QByteArray &message)
     QHash<QByteArray, QByteArray>::const_iterator quoteIter = _ctcpXDelimDequoteHash.constBegin();
     while (quoteIter != _ctcpXDelimDequoteHash.constEnd()) {
         quotedMessage.replace(quoteIter.value(), quoteIter.key());
-        quoteIter++;
+        ++quoteIter;
     }
     return quotedMessage;
 }
@@ -185,7 +185,7 @@ void CtcpParser::parseSimple(IrcEventRawMessage *e, Message::Type messagetype, Q
     if (dequotedMessage.count(XDELIM) != 2 || dequotedMessage[0] != '\001' || dequotedMessage[dequotedMessage.count() -1] != '\001') {
         displayMsg(e, messagetype, targetDecode(e, dequotedMessage), e->prefix(), e->target(), flags);
     } else {
-        int spacePos = -1;
+        int spacePos;
         QString ctcpcmd, ctcpparam;
 
         QByteArray ctcp = xdelimDequote(dequotedMessage.mid(1, dequotedMessage.count() - 2));

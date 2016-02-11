@@ -9,5 +9,5 @@
 #define GIT_DESCRIBE "@GIT_DESCRIBE@"
 
 // Will be substituted in official tarballs
-#define DIST_HASH "9c5e6c666d5faa976eec2e0ac8bf8e1dd6c0332c"
-#define DIST_DATE "1429822037"
+#define DIST_HASH "732615f1a1ba7391ef21fe723c5840bf035a9d19"
+#define DIST_DATE "1455051754"

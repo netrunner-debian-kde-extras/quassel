@@ -463,6 +463,12 @@ bool QueryBufferItem::setData(int column, const QVariant &value, int role)
     case Qt::EditRole:
     {
         QString newName = value.toString();
+
+        // Sanity check - buffer names must not contain newlines!
+        int nlpos = newName.indexOf('\n');
+        if (nlpos >= 0)
+            newName = newName.left(nlpos);
+
         if (!newName.isEmpty()) {
             Client::renameBuffer(bufferId(), newName);
             return true;
@@ -723,7 +729,7 @@ void ChannelBufferItem::addUsersToCategory(const QList<IrcUser *> &ircUsers)
     QHash<UserCategoryItem *, QList<IrcUser *> >::const_iterator catIter = categories.constBegin();
     while (catIter != categories.constEnd()) {
         catIter.key()->addUsers(catIter.value());
-        catIter++;
+        ++catIter;
     }
 }
 

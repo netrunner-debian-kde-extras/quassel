@@ -33,13 +33,6 @@
 #include "networkmodel.h"
 #include "uistyle.h"
 
-class CheckRemovalEvent : public QEvent
-{
-public:
-    CheckRemovalEvent(const QModelIndex &source_index) : QEvent(QEvent::User), index(source_index) {};
-    QPersistentModelIndex index;
-};
-
 
 /*****************************************
 * The Filter for the Tree View
@@ -56,9 +49,6 @@ BufferViewFilter::BufferViewFilter(QAbstractItemModel *model, BufferViewConfig *
     setSourceModel(model);
 
     setDynamicSortFilter(true);
-
-    connect(this, SIGNAL(_dataChanged(const QModelIndex &, const QModelIndex &)),
-        this, SLOT(_q_sourceDataChanged(QModelIndex, QModelIndex)));
 
     _enableEditMode.setCheckable(true);
     _enableEditMode.setChecked(_editMode);
@@ -161,12 +151,12 @@ void BufferViewFilter::enableEditMode(bool enable)
     if (enable == false) {
         addBuffers(QList<BufferId>::fromSet(_toAdd));
         QSet<BufferId>::const_iterator iter;
-        for (iter = _toTempRemove.constBegin(); iter != _toTempRemove.constEnd(); iter++) {
+        for (iter = _toTempRemove.constBegin(); iter != _toTempRemove.constEnd(); ++iter) {
             if (config()->temporarilyRemovedBuffers().contains(*iter))
                 continue;
             config()->requestRemoveBuffer(*iter);
         }
-        for (iter = _toRemove.constBegin(); iter != _toRemove.constEnd(); iter++) {
+        for (iter = _toRemove.constBegin(); iter != _toRemove.constEnd(); ++iter) {
             if (config()->removedBuffers().contains(*iter))
                 continue;
             config()->requestRemoveBufferPermanently(*iter);
@@ -539,34 +529,6 @@ bool BufferViewFilter::setCheckedState(const QModelIndex &index, Qt::CheckState 
     }
     emit dataChanged(index, index);
     return true;
-}
-
-
-void BufferViewFilter::checkPreviousCurrentForRemoval(const QModelIndex &current, const QModelIndex &previous)
-{
-    Q_UNUSED(current);
-    if (previous.isValid())
-        QCoreApplication::postEvent(this, new CheckRemovalEvent(previous));
-}
-
-
-void BufferViewFilter::customEvent(QEvent *event)
-{
-    if (event->type() != QEvent::User)
-        return;
-
-    CheckRemovalEvent *removalEvent = static_cast<CheckRemovalEvent *>(event);
-    checkItemForRemoval(removalEvent->index);
-
-    event->accept();
-}
-
-
-void BufferViewFilter::checkItemsForRemoval(const QModelIndex &topLeft, const QModelIndex &bottomRight)
-{
-    QModelIndex source_topLeft = mapToSource(topLeft);
-    QModelIndex source_bottomRight = mapToSource(bottomRight);
-    emit _dataChanged(source_topLeft, source_bottomRight);
 }
 
 
