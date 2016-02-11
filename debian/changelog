@@ -1,6 +1,10 @@
 quassel (1:0.12.3-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Drop patches that have been applied upstream:
+    - 02_set-required-libs-and-flags.patch
+    - 04_fix_ftbfs_qt55.patch
+    - CVE-2015-8547.patch
 
  -- Felix Geyer <fgeyer@debian.org>  Thu, 11 Feb 2016 19:23:22 +0100
 

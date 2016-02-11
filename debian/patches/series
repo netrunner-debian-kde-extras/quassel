@@ -1,5 +1,5 @@
 01_default_network_channel.patch
-02_set-required-libs-and-flags.patch
+#02_set-required-libs-and-flags.patch
 03_force_icon_theme.patch
-04_fix_ftbfs_qt55.patch
-CVE-2015-8547.patch
+#04_fix_ftbfs_qt55.patch
+#CVE-2015-8547.patch
