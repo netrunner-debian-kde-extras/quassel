@@ -11,6 +11,8 @@ override_dh_auto_configure:
 
 override_dh_install:
 	dh_install --fail-missing
+	# replace inxi with a symlink
+	rm debian/quassel-data/usr/share/quassel/scripts/inxi
 
 override_dh_installinit:
 	dh_installinit -r --error-handler=exit --name=quasselcore
