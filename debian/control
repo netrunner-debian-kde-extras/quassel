@@ -33,6 +33,7 @@ Vcs-Browser: https://anonscm.debian.org/cgit/pkg-kde/kde-extras/quassel.git/
 Package: quassel-core
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, libqt5sql5-sqlite, lsb-base (>= 3.2-14), openssl
+Suggests: libqt5sql5-psql
 Description: distributed IRC client - core component
  Quassel is a modern, cross-platform, distributed IRC client, meaning that
  one or more clients can attach to and detach from the central core. It's
