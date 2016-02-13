@@ -14,3 +14,9 @@ override_dh_install:
 
 override_dh_installinit:
 	dh_installinit -r --error-handler=exit --name=quasselcore
+
+override_dh_systemd_enable:
+	dh_systemd_enable --name=quasselcore
+
+override_dh_systemd_start:
+	dh_systemd_start --name=quasselcore
